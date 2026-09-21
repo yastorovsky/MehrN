@@ -237,7 +237,7 @@ jobs:
 
       - name: Create or Update GitHub Release
         if: github.ref_type == 'tag' || inputs.create_release == true || github.ref_name == 'main'
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: ${{ env.TAG_NAME }}
