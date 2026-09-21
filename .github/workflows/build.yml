@@ -226,7 +226,7 @@ jobs:
           Write-Host ("Created archive: {0} ({1:N2} MB)" -f $zipPath, $size)
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: MehrN-windows-64
           path: |
