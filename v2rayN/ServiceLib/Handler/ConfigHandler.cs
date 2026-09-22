@@ -1631,11 +1631,9 @@ public static class ConfigHandler
     public static ProfileItem? GetPreSocksItem(Config config, ProfileItem node, ECoreType coreType)
     {
         ProfileItem? itemSocks = null;
-        var enableLegacyProtect = config.TunModeItem.EnableLegacyProtect;
         if (node.ConfigType != EConfigType.Custom
             && coreType != ECoreType.sing_box
-            && config.TunModeItem.EnableTun
-            && enableLegacyProtect)
+            && config.TunModeItem.EnableTun)
         {
             itemSocks = new ProfileItem()
             {
@@ -1649,7 +1647,7 @@ public static class ConfigHandler
             && node.PreSocksPort is > 0 and <= 65535)
         {
             var customPreCoreType = AppManager.Instance.GetCoreType(null, EConfigType.Custom);
-            var preCoreType = (enableLegacyProtect && config.TunModeItem.EnableTun) ? ECoreType.sing_box : customPreCoreType;
+            var preCoreType = config.TunModeItem.EnableTun ? ECoreType.sing_box : customPreCoreType;
             itemSocks = new ProfileItem()
             {
                 CoreType = preCoreType,
