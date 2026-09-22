@@ -136,7 +136,7 @@ _upstream_mhr_cfw/           MHR-CFW integration source
 
 ## Contributing
 
-Every PR and helping hand is welcome — bug reports, translations, docs, and new ideas.
+Every PR and helping hand is welcome bug reports, translations, docs, and new ideas.
 
 ## License and acknowledgements
 
