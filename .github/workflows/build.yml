@@ -510,13 +510,13 @@ jobs:
           echo "TAG_NAME=$tag" >> $GITHUB_ENV
 
       - name: Download Windows Artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: MehrON-windows-64
           path: ./dist/MehrON-windows-64
 
       - name: Download Linux Artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: MehrON-linux-64
           path: ./dist/MehrON-linux-64
