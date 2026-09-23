@@ -6,6 +6,7 @@ public partial class CoreConfigSingboxService
     {
         ApplyOutboundBindInterface();
         ApplyOutboundSendThrough();
+        ApplyExternalTunProtect();
 
         var coreConfigContent = ApplyCustomOutboundReplace();
 
@@ -141,6 +142,36 @@ public partial class CoreConfigSingboxService
         }
 
         return JsonUtils.Serialize(fullConfigTemplateNode);
+    }
+
+    private void ApplyExternalTunProtect()
+    {
+        if (!context.IsTunEnabled || context.IsTunInbound || _coreConfig.route == null)
+        {
+            return;
+        }
+
+        if (Utils.IsLinux())
+        {
+            _coreConfig.route.default_mark = ZeptunManager.Fwmark;
+            Logging.SaveLog($"{_tag} external TUN protect: default_mark {ZeptunManager.Fwmark}");
+            return;
+        }
+
+        var bindInterface = _config.CoreBasicItem.BindInterface?.TrimEx();
+        if (bindInterface.IsNullOrEmpty())
+        {
+            bindInterface = Utils.GetDefaultInterfaceName();
+        }
+        if (bindInterface.IsNullOrEmpty())
+        {
+            Logging.SaveLog($"{_tag} external TUN is active but no interface could be detected; the core's own traffic may loop back into the tunnel");
+            return;
+        }
+
+        Logging.SaveLog($"{_tag} external TUN protect: default_interface {bindInterface}");
+        _coreConfig.route.auto_detect_interface = false;
+        _coreConfig.route.default_interface = bindInterface;
     }
 
     private void ApplyOutboundBindInterface()

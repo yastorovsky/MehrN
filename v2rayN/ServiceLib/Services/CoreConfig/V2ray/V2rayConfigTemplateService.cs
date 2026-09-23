@@ -6,6 +6,7 @@ public partial class CoreConfigV2rayService
     {
         ApplyOutboundBindInterface();
         ApplyOutboundSendThrough();
+        ApplyExternalTunProtect();
 
         var coreConfigContent = ApplyCustomOutboundReplace();
 
@@ -226,6 +227,72 @@ public partial class CoreConfigV2rayService
         fullConfigTemplateNode["outbounds"] = customOutboundsNode;
 
         return JsonUtils.Serialize(fullConfigTemplateNode);
+    }
+
+    private void ApplyExternalTunProtect()
+    {
+        if (!context.IsTunEnabled || context.IsTunInbound)
+        {
+            return;
+        }
+
+        var mark = Utils.IsLinux() ? ZeptunManager.Fwmark : 0;
+        var bindInterface = _config.CoreBasicItem.BindInterface?.TrimEx();
+        if (mark == 0 && bindInterface.IsNullOrEmpty())
+        {
+            bindInterface = Utils.GetDefaultInterfaceName();
+        }
+        if (mark == 0 && bindInterface.IsNullOrEmpty())
+        {
+            Logging.SaveLog($"{_tag} external TUN is active but no interface could be detected; the core's own traffic may loop back into the tunnel");
+            return;
+        }
+
+        Logging.SaveLog(mark != 0
+            ? $"{_tag} external TUN protect: fwmark {mark}"
+            : $"{_tag} external TUN protect: bind interface {bindInterface}");
+
+        foreach (var outbound in _coreConfig.outbounds ?? [])
+        {
+            if (!ShouldProtectFromExternalTun(outbound))
+            {
+                continue;
+            }
+            outbound.streamSettings ??= new();
+            outbound.streamSettings.sockopt ??= new();
+            if (mark != 0)
+            {
+                outbound.streamSettings.sockopt.mark = mark;
+            }
+            else if (outbound.streamSettings.sockopt.Interface.IsNullOrEmpty())
+            {
+                outbound.streamSettings.sockopt.Interface = bindInterface;
+            }
+        }
+    }
+
+    private static bool ShouldProtectFromExternalTun(Outbounds4Ray outbound)
+    {
+        if (outbound.protocol is "blackhole" or "loopback")
+        {
+            return false;
+        }
+
+        if (outbound.streamSettings?.sockopt?.dialerProxy.IsNullOrEmpty() == false)
+        {
+            return false;
+        }
+
+        var outboundAddress = outbound.settings?.address?.ToString()
+                              ?? outbound.settings?.peers?.FirstOrDefault()?.endpoint
+                              ?? string.Empty;
+
+        if (outboundAddress.Equals("localhost", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        return !IPAddress.TryParse(outboundAddress, out var address) || !IPAddress.IsLoopback(address);
     }
 
     private void ApplyOutboundBindInterface()

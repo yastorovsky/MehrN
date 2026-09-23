@@ -199,6 +199,22 @@ jobs:
             }
           }
 
+          # Download latest Zeptun TUN engine
+          Write-Host "Downloading latest Zeptun..."
+          New-Item -ItemType Directory -Path "$binDir/zeptun" -Force | Out-Null
+          $zeptunZip = "zeptun-latest.zip"
+          curl.exe -L -s -o $zeptunZip "https://github.com/Noisemux/zeptun/releases/latest/download/zeptun-windows-x86_64.zip"
+          Expand-Archive -Path $zeptunZip -DestinationPath "zeptun-extracted" -Force
+          $zeptunExe = Get-ChildItem -Path "zeptun-extracted" -Recurse -Filter "zeptun.exe" | Select-Object -First 1
+          if ($zeptunExe) {
+            Copy-Item -Path $zeptunExe.FullName -Destination "$binDir/zeptun/zeptun.exe" -Force
+            $wintunDll = Get-ChildItem -Path "zeptun-extracted" -Recurse -Filter "wintun.dll" | Select-Object -First 1
+            if ($wintunDll) {
+              Copy-Item -Path $wintunDll.FullName -Destination "$binDir/zeptun/wintun.dll" -Force
+            }
+          }
+          Remove-Item -Path $zeptunZip, "zeptun-extracted" -Recurse -Force -ErrorAction SilentlyContinue
+
           # Verify core binaries exist and print versions
           if (-not (Test-Path "$binDir/xray/xray.exe")) {
             throw "xray.exe was not found or copied into bin/xray/"
@@ -211,6 +227,12 @@ jobs:
           }
           if (-not (Test-Path "$binDir/aether/aether.exe")) {
             throw "aether.exe was not found or copied into bin/aether/"
+          }
+          if (-not (Test-Path "$binDir/zeptun/zeptun.exe")) {
+            throw "zeptun.exe was not found or copied into bin/zeptun/"
+          }
+          if (-not (Test-Path "$binDir/zeptun/wintun.dll")) {
+            throw "wintun.dll was not found or copied into bin/zeptun/"
           }
           if (-not (Test-Path "$binDir/sni-spoofing/sni-spoof-rs.exe")) {
             throw "sni-spoof-rs.exe was not found in bin/sni-spoofing/"
@@ -329,7 +351,7 @@ jobs:
         run: |
           outDir="./dist/MehrON-linux-64"
           binDir="$outDir/bin"
-          mkdir -p "$binDir/xray" "$binDir/sing_box" "$binDir/mihomo" "$binDir/aether"
+          mkdir -p "$binDir/xray" "$binDir/sing_box" "$binDir/mihomo" "$binDir/aether" "$binDir/zeptun"
 
           # Download latest Xray-core (Linux 64)
           echo "Downloading latest Xray-core..."
@@ -380,11 +402,17 @@ jobs:
           fi
           rm -rf aether.tar.gz aether-extracted
 
+          # Download latest Zeptun TUN engine (Linux x86_64)
+          echo "Downloading latest Zeptun..."
+          curl -fsSL "https://github.com/Noisemux/zeptun/releases/latest/download/zeptun-linux-x86_64" -o "$binDir/zeptun/zeptun"
+          chmod +x "$binDir/zeptun/zeptun"
+
           # Verify bundled core versions
           if [ ! -f "$binDir/xray/xray" ]; then echo "xray was not found!" >&2; exit 1; fi
           if [ ! -f "$binDir/sing_box/sing-box" ]; then echo "sing-box was not found!" >&2; exit 1; fi
           if [ ! -f "$binDir/mihomo/mihomo" ]; then echo "mihomo was not found!" >&2; exit 1; fi
           if [ ! -f "$binDir/aether/aether" ]; then echo "aether was not found!" >&2; exit 1; fi
+          if [ ! -f "$binDir/zeptun/zeptun" ]; then echo "zeptun was not found!" >&2; exit 1; fi
 
           echo "Verifying bundled core versions:"
           "$binDir/xray/xray" version

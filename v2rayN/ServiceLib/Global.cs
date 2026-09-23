@@ -610,6 +610,42 @@ public class Global
         "mixed"
     ];
 
+    #region Zeptun
+
+    public static readonly List<string> TunEngines =
+    [
+        TunnelingItem.CoreSingbox,
+        TunnelingItem.CoreZeptun
+    ];
+
+    public const string ZeptunCoreName = "zeptun";
+    public const string ZeptunDefaultInterfaceName = "zeptun0";
+    public const string ZeptunDefaultDnsUpstream = "1.1.1.1:53";
+    public const string ZeptunProjectUrl = "https://github.com/Noisemux/zeptun";
+
+    public static readonly List<string> ZeptunStacks =
+    [
+        "userspace",
+        "hybrid",
+        "system"
+    ];
+
+    public static readonly List<string> ZeptunUdpModes =
+    [
+        "udp",
+        "tcp"
+    ];
+
+    public static readonly List<string> ZeptunLogLevels =
+    [
+        "err",
+        "warn",
+        "info",
+        "debug"
+    ];
+
+    #endregion Zeptun
+
     public static readonly List<string> PresetMsgFilters =
     [
         "proxy",
@@ -684,6 +720,7 @@ public class Global
         { ECoreType.shadowquic, "spongebob888/shadowquic" },
         { ECoreType.mieru, "enfein/mieru" },
         { ECoreType.aether, "CluvexStudio/Aether" },
+        { ECoreType.zeptun, "Noisemux/zeptun" },
         { ECoreType.v2rayN, "yastorovsky/MehrON" },
     };
 

@@ -851,6 +851,77 @@ public class Utils
             .Any(ni => ni.Name.Equals(inInterfaceName, StringComparison.OrdinalIgnoreCase));
     }
 
+    public static string? GetDefaultInterfaceName()
+    {
+        try
+        {
+            var usable = NetworkInterface.GetAllNetworkInterfaces()
+                .Where(ni => ni.OperationalStatus == OperationalStatus.Up
+                             && ni.NetworkInterfaceType != NetworkInterfaceType.Loopback
+                             && ni.NetworkInterfaceType != NetworkInterfaceType.Tunnel
+                             && !IsTunnelInterfaceName(ni.Name))
+                .ToList();
+
+            if (usable.Count == 0)
+            {
+                Logging.SaveLog($"{nameof(GetDefaultInterfaceName)}: no usable interface found");
+                return null;
+            }
+
+            var localAddress = GetOutboundLocalAddress();
+            if (localAddress != null)
+            {
+                var matched = usable.FirstOrDefault(ni => ni.GetIPProperties().UnicastAddresses
+                    .Any(ua => ua.Address.Equals(localAddress)));
+                if (matched != null)
+                {
+                    Logging.SaveLog($"{nameof(GetDefaultInterfaceName)}: {matched.Name} (source address {localAddress})");
+                    return matched.Name;
+                }
+            }
+
+            var byGateway = usable
+                .Where(ni => ni.GetIPProperties().GatewayAddresses
+                    .Any(g => g.Address != null
+                              && !g.Address.Equals(IPAddress.Any)
+                              && !g.Address.Equals(IPAddress.IPv6Any)))
+                .Select(ni => ni.Name)
+                .FirstOrDefault();
+
+            Logging.SaveLog(byGateway.IsNullOrEmpty()
+                ? $"{nameof(GetDefaultInterfaceName)}: no interface with a gateway among [{string.Join(", ", usable.Select(ni => ni.Name))}]"
+                : $"{nameof(GetDefaultInterfaceName)}: {byGateway} (by gateway)");
+            return byGateway;
+        }
+        catch (Exception ex)
+        {
+            Logging.SaveLog(nameof(GetDefaultInterfaceName), ex);
+            return null;
+        }
+    }
+
+    private static bool IsTunnelInterfaceName(string name)
+    {
+        return name.StartsWith("utun", StringComparison.OrdinalIgnoreCase)
+               || name.Contains("singbox_tun", StringComparison.OrdinalIgnoreCase)
+               || name.Contains("xray_tun", StringComparison.OrdinalIgnoreCase)
+               || name.Contains(Global.ZeptunCoreName, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static IPAddress? GetOutboundLocalAddress()
+    {
+        try
+        {
+            using var socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            socket.Connect(new IPEndPoint(IPAddress.Parse("8.8.8.8"), 53));
+            return (socket.LocalEndPoint as IPEndPoint)?.Address;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
     /// <summary>
     /// Whether the host holds a globally routable IPv6 address, that is one inside 2000::/3.
     /// Link-local and unique local addresses are excluded: they never reach the IPv6 internet,
