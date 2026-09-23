@@ -895,6 +895,11 @@ public class Utils
         return File.Exists(upgradeFileName);
     }
 
+    public static bool IsNixOS()
+    {
+        return !IsWindows() && (File.Exists("/etc/NIXOS") || Directory.Exists("/nix/store") || Environment.GetEnvironmentVariable("NIX_PATH") != null);
+    }
+
     /// <summary>
     /// Get version
     /// </summary>
@@ -903,9 +908,10 @@ public class Utils
     {
         try
         {
+            var edition = IsNixOS() ? $" ({Global.AppEdition})" : string.Empty;
             return blFull
-                ? $"{Global.AppName} ({Global.AppEdition}) - V{GetVersionInfo()} - {RuntimeInformation.ProcessArchitecture}"
-                : $"{Global.AppName} ({Global.AppEdition})/{GetVersionInfo()}";
+                ? $"{Global.AppName}{edition} - V{GetVersionInfo()} - {RuntimeInformation.ProcessArchitecture}"
+                : $"{Global.AppName}{edition}/{GetVersionInfo()}";
         }
         catch (Exception ex)
         {
