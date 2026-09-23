@@ -92,7 +92,7 @@ public static class CoreConfigHandler
         }
     }
 
-    private static async Task<RetResult> GenerateClientAetherConfig(ProfileItem node, string? fileName)
+    public static async Task<RetResult> GenerateClientAetherConfig(ProfileItem node, string? fileName)
     {
         var ret = new RetResult();
         try
@@ -138,7 +138,7 @@ public static class CoreConfigHandler
         }
     }
 
-    private static async Task<RetResult> GenerateClientPsiphonConfig(ProfileItem node, string? fileName)
+    public static async Task<RetResult> GenerateClientPsiphonConfig(ProfileItem node, string? fileName, string? upstreamProxyUrl = null)
     {
         var ret = new RetResult();
         try
@@ -172,7 +172,10 @@ public static class CoreConfigHandler
                 ? extra.PsiphonCdnFrontingEdges
                 : (globalPsiphon?.CdnFrontingEdges ?? "");
 
-            var dataDir = Path.Combine(Utils.GetBinConfigPath(), "psiphon_data");
+            var dirSuffix = fileName.IsNotEmpty() && Path.GetFileNameWithoutExtension(fileName) != "config"
+                ? $"_{Path.GetFileNameWithoutExtension(fileName)}"
+                : "";
+            var dataDir = Path.Combine(Utils.GetBinConfigPath(), $"psiphon_data{dirSuffix}");
             if (!Directory.Exists(dataDir))
             {
                 Directory.CreateDirectory(dataDir);
@@ -191,6 +194,11 @@ public static class CoreConfigHandler
                 ["DisableLocalSocksProxy"] = false,
                 ["DisableLocalHTTPProxy"] = false,
             };
+
+            if (upstreamProxyUrl.IsNotEmpty())
+            {
+                psiphonConfig["UpstreamProxyUrl"] = upstreamProxyUrl;
+            }
 
             // CDN fronting fields (shirokhorshid fork feature)
             if (cdnFronting && cdnEdges.IsNotEmpty())

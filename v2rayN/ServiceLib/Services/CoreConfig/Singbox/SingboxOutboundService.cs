@@ -750,7 +750,11 @@ public partial class CoreConfigSingboxService
 
             if (!dialerProxyTag.IsNullOrEmpty())
             {
-                outbound.detour = dialerProxyTag;
+                var nextNode = i != nodesReverse.Count - 1 ? nodesReverse[i + 1] : null;
+                if (node.ConfigType != EConfigType.Custom || nextNode?.ConfigType != EConfigType.Custom)
+                {
+                    outbound.detour = dialerProxyTag;
+                }
             }
 
             resultOutbounds.Add(outbound);

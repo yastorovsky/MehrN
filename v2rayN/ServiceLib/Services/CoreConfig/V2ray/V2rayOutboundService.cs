@@ -746,7 +746,11 @@ public partial class CoreConfigV2rayService
 
             if (!dialerProxyTag.IsNullOrEmpty())
             {
-                FillDialerProxy(outbound, dialerProxyTag);
+                var nextNode = i != nodesReverse.Count - 1 ? nodesReverse[i + 1] : null;
+                if (node.ConfigType != EConfigType.Custom || nextNode?.ConfigType != EConfigType.Custom)
+                {
+                    FillDialerProxy(outbound, dialerProxyTag);
+                }
             }
 
             resultOutbounds.Add(outbound);

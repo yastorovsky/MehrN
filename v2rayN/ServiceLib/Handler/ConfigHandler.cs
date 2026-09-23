@@ -1695,16 +1695,6 @@ public static class ConfigHandler
                 Port = node.PreSocksPort.Value,
             };
         }
-        else if (node.ConfigType == EConfigType.ProxyChain)
-        {
-            var childIds = Utils.String2List(node.GetProtocolExtra()?.ChildItems) ?? [];
-            var children = await AppManager.Instance.GetProfileItemsByIndexIds(childIds);
-            var customChild = children?.FirstOrDefault(c => c.ConfigType == EConfigType.Custom && c.CoreType is ECoreType.aether or ECoreType.psiphon);
-            if (customChild != null)
-            {
-                itemSocks = customChild;
-            }
-        }
         return itemSocks;
     }
 

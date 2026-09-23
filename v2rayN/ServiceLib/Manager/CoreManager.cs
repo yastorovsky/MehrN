@@ -14,6 +14,7 @@ public class CoreManager
 
     private ProcessService? _processService;
     private ProcessService? _processPreService;
+    private readonly List<ProcessService> _extraProcessServices = [];
     private bool _linuxSudo = false;
     private Func<bool, string, Task>? _updateFunc;
     private const string _tag = "CoreHandler";
@@ -95,6 +96,100 @@ public class CoreManager
         {
             await Task.Delay(100);
             await WindowsUtils.RemoveTunDevice();
+        }
+
+        if (node.ConfigType == EConfigType.ProxyChain)
+        {
+            var childIds = Utils.String2List(node.GetProtocolExtra()?.ChildItems) ?? [];
+            var children = await AppManager.Instance.GetProfileItemsByIndexIds(childIds);
+            var mid = children.ElementAtOrDefault(0);
+            var exit = children.ElementAtOrDefault(1);
+
+            if (mid != null && exit != null)
+            {
+                if (mid.ConfigType == EConfigType.Custom && exit.ConfigType == EConfigType.Custom)
+                {
+                    var midPort = mid.PreSocksPort is > 0 and <= 65535 ? mid.PreSocksPort.Value : (mid.CoreType == ECoreType.aether ? 1819 : 1080);
+                    var exitPort = exit.PreSocksPort is > 0 and <= 65535 ? exit.PreSocksPort.Value : (exit.CoreType == ECoreType.aether ? 1819 : 1080);
+                    if (exitPort == midPort)
+                    {
+                        exitPort = midPort == 1080 ? 1081 : 1080;
+                        exit = JsonUtils.DeepCopy(exit);
+                        exit.PreSocksPort = exitPort;
+                        if (mainContext.AllProxiesMap.ContainsKey(exit.IndexId))
+                        {
+                            mainContext.AllProxiesMap[exit.IndexId] = exit;
+                        }
+                    }
+
+                    // 1. Start Middle core first
+                    var midProc = await StartCustomChildCore(mid, "configChain_mid.json");
+                    if (midProc != null)
+                    {
+                        _extraProcessServices.Add(midProc);
+                    }
+                    await WaitForPort(midPort);
+
+                    // 2. Start Exit core chained through Middle core
+                    var upstreamProxy = $"socks5://127.0.0.1:{midPort}";
+                    var exitProc = await StartCustomChildCore(exit, "configChain_exit.json", upstreamProxy);
+                    if (exitProc != null)
+                    {
+                        _extraProcessServices.Add(exitProc);
+                    }
+                    await WaitForPort(exitPort);
+
+                    // 3. Re-generate main core config with updated AllProxiesMap and start main core (Xray / Sing-box)
+                    await CoreConfigHandler.GenerateClientConfig(mainContext, fileName);
+                    await CoreStart(mainContext);
+                    AppManager.Instance.RunningCoreType = mainContext.RunCoreType;
+                    if (_processService != null)
+                    {
+                        await UpdateFunc(true, $"{node.GetSummary()}");
+                    }
+                    return;
+                }
+                else if (mid.ConfigType == EConfigType.Custom)
+                {
+                    var midPort = mid.PreSocksPort is > 0 and <= 65535 ? mid.PreSocksPort.Value : (mid.CoreType == ECoreType.aether ? 1819 : 1080);
+                    var midProc = await StartCustomChildCore(mid, "configChain_mid.json");
+                    if (midProc != null)
+                    {
+                        _extraProcessServices.Add(midProc);
+                    }
+                    await WaitForPort(midPort);
+
+                    await CoreStart(mainContext);
+                    AppManager.Instance.RunningCoreType = mainContext.RunCoreType;
+                    if (_processService != null)
+                    {
+                        await UpdateFunc(true, $"{node.GetSummary()}");
+                    }
+                    return;
+                }
+                else if (exit.ConfigType == EConfigType.Custom)
+                {
+                    await CoreStart(mainContext);
+                    var localSocksPort = AppManager.Instance.GetLocalPort(EInboundProtocol.socks);
+                    await WaitForPort(localSocksPort);
+
+                    var upstreamProxy = $"socks5://127.0.0.1:{localSocksPort}";
+                    var exitPort = exit.PreSocksPort is > 0 and <= 65535 ? exit.PreSocksPort.Value : (exit.CoreType == ECoreType.aether ? 1819 : 1080);
+                    var exitProc = await StartCustomChildCore(exit, "configChain_exit.json", upstreamProxy);
+                    if (exitProc != null)
+                    {
+                        _extraProcessServices.Add(exitProc);
+                    }
+                    await WaitForPort(exitPort);
+
+                    AppManager.Instance.RunningCoreType = mainContext.RunCoreType;
+                    if (_processService != null)
+                    {
+                        await UpdateFunc(true, $"{node.GetSummary()}");
+                    }
+                    return;
+                }
+            }
         }
 
         if (preContext?.Node?.ConfigType == EConfigType.Custom)
@@ -183,6 +278,20 @@ public class CoreManager
                 _processPreService = null;
             }
 
+            foreach (var p in _extraProcessServices)
+            {
+                try
+                {
+                    await p.StopAsync();
+                    p.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    Logging.SaveLog(_tag, ex);
+                }
+            }
+            _extraProcessServices.Clear();
+
             await SniSpoofingManager.Instance.StopAsync();
         }
         catch (Exception ex)
@@ -234,6 +343,35 @@ public class CoreManager
         await _updateFunc?.Invoke(notify, msg);
     }
 
+    private async Task<ProcessService?> StartCustomChildCore(ProfileItem node, string configFileName, string? upstreamProxy = null)
+    {
+        var coreType = node.CoreType;
+        var fullConfigPath = Utils.GetBinConfigPath(configFileName);
+        RetResult result;
+        if (coreType == ECoreType.psiphon)
+        {
+            result = await CoreConfigHandler.GenerateClientPsiphonConfig(node, fullConfigPath, upstreamProxy);
+        }
+        else if (coreType == ECoreType.aether)
+        {
+            result = await CoreConfigHandler.GenerateClientAetherConfig(node, fullConfigPath);
+        }
+        else
+        {
+            result = await CoreConfigHandler.GenerateClientConfig(new CoreConfigContext { Node = node }, fullConfigPath);
+        }
+
+        if (!result.Success)
+        {
+            await UpdateFunc(false, result.Msg);
+            return null;
+        }
+
+        var coreInfo = CoreInfoManager.Instance.GetCoreInfo(coreType);
+        var displayLog = node.DisplayLog || coreType is ECoreType.psiphon or ECoreType.aether;
+        return await RunProcess(coreInfo, configFileName, displayLog, false, false, node, upstreamProxy);
+    }
+
     private static async Task WaitForProxyPort(CoreConfigContext? preContext)
     {
         if (preContext is null)
@@ -241,12 +379,22 @@ public class CoreManager
             return;
         }
 
-        using var rootCts = new CancellationTokenSource(TimeSpan.FromSeconds(20));
-        var rootToken = rootCts.Token;
-
         var port = preContext.Node.ConfigType == EConfigType.Custom
             ? (preContext.Node.PreSocksPort is > 0 and <= 65535 ? preContext.Node.PreSocksPort.Value : (preContext.Node.CoreType == ECoreType.aether ? 1819 : 1080))
             : preContext.Node.Port;
+        await WaitForPort(port);
+    }
+
+    private static async Task WaitForPort(int port)
+    {
+        if (port <= 0 || port > 65535)
+        {
+            return;
+        }
+
+        using var rootCts = new CancellationTokenSource(TimeSpan.FromSeconds(20));
+        var rootToken = rootCts.Token;
+
         // SOCKS5 client greeting: VER=5, NMETHODS=1, METHOD=0x00 (no auth)
         ReadOnlyMemory<byte> greeting = new byte[] { 0x05, 0x01, 0x00 };
         var buf = new byte[2];
@@ -266,8 +414,8 @@ public class CoreManager
 
                 var read = await stream.ReadAsync(buf.AsMemory(0, 2), linkedToken);
 
-                // Server selection: VER=5, METHOD=0x00 — proxy is fully ready
-                if (read == 2 && buf[0] == 0x05)
+                // Server selection: VER=5, METHOD=0x00 or any read response — proxy is ready
+                if (read > 0)
                 {
                     return;
                 }
@@ -278,7 +426,7 @@ public class CoreManager
                 {
                     continue;
                 }
-                Logging.SaveLog($"WaitForProxyPort Timeout waiting for proxy port {port} to be ready.");
+                Logging.SaveLog($"WaitForPort Timeout waiting for port {port} to be ready.");
                 return;
             }
             catch (SocketException ex) when (ex.SocketErrorCode == SocketError.ConnectionRefused)
@@ -290,7 +438,7 @@ public class CoreManager
                 }
                 catch (OperationCanceledException)
                 {
-                    Logging.SaveLog($"WaitForProxyPort Timeout waiting for proxy port {port} to be ready.");
+                    Logging.SaveLog($"WaitForPort Timeout waiting for port {port} to be ready.");
                     return;
                 }
             }
@@ -318,7 +466,7 @@ public class CoreManager
             && isNonWindows;
     }
 
-    private async Task<ProcessService?> RunProcess(CoreInfo? coreInfo, string configPath, bool displayLog, bool mayNeedSudo, bool isTunLaunch = false, ProfileItem? node = null)
+    private async Task<ProcessService?> RunProcess(CoreInfo? coreInfo, string configPath, bool displayLog, bool mayNeedSudo, bool isTunLaunch = false, ProfileItem? node = null, string? upstreamProxy = null)
     {
         var fileName = CoreInfoManager.Instance.GetCoreExecFile(coreInfo, out var msg);
         if (fileName.IsNullOrEmpty())
@@ -337,7 +485,7 @@ public class CoreManager
                 return await CoreAdminManager.Instance.RunProcessAsLinuxSudo(fileName, coreInfo, configPath);
             }
 
-            return await RunProcessNormal(fileName, coreInfo, configPath, displayLog, node);
+            return await RunProcessNormal(fileName, coreInfo, configPath, displayLog, node, upstreamProxy);
         }
         catch (Exception ex)
         {
@@ -347,7 +495,7 @@ public class CoreManager
         }
     }
 
-    private async Task<ProcessService?> RunProcessNormal(string fileName, CoreInfo? coreInfo, string configPath, bool displayLog, ProfileItem? node = null)
+    private async Task<ProcessService?> RunProcessNormal(string fileName, CoreInfo? coreInfo, string configPath, bool displayLog, ProfileItem? node = null, string? upstreamProxy = null)
     {
         var environmentVars = new Dictionary<string, string>();
         foreach (var kv in coreInfo.Environment)
@@ -398,6 +546,17 @@ public class CoreManager
             var socksPort = node.PreSocksPort is > 0 and <= 65535 ? node.PreSocksPort.Value : 1819;
             argsList.Add($"--bind 127.0.0.1:{socksPort}");
 
+            if (upstreamProxy.IsNotEmpty())
+            {
+                argsList.Add($"--upstream {upstreamProxy}");
+                environmentVars["ALL_PROXY"] = upstreamProxy;
+                environmentVars["all_proxy"] = upstreamProxy;
+                environmentVars["HTTP_PROXY"] = upstreamProxy;
+                environmentVars["http_proxy"] = upstreamProxy;
+                environmentVars["HTTPS_PROXY"] = upstreamProxy;
+                environmentVars["https_proxy"] = upstreamProxy;
+            }
+
             arguments = $"{arguments} {string.Join(" ", argsList)}";
 
             if (extra?.AetherProtocol.IsNullOrEmpty() == false)
@@ -422,7 +581,10 @@ public class CoreManager
 
         if (coreInfo.CoreType == ECoreType.psiphon)
         {
-            var dataDir = Path.Combine(Utils.GetBinConfigPath(), "psiphon_data");
+            var dirSuffix = configPath.IsNotEmpty() && Path.GetFileNameWithoutExtension(configPath) != "config"
+                ? $"_{Path.GetFileNameWithoutExtension(configPath)}"
+                : "";
+            var dataDir = Path.Combine(Utils.GetBinConfigPath(), $"psiphon_data{dirSuffix}");
             if (!Directory.Exists(dataDir))
             {
                 Directory.CreateDirectory(dataDir);
