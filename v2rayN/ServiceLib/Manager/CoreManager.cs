@@ -97,9 +97,18 @@ public class CoreManager
             await WindowsUtils.RemoveTunDevice();
         }
 
-        await CoreStart(mainContext);
-        await WaitForProxyPort(preContext);
-        await CoreStartPreService(preContext);
+        if (preContext?.Node?.ConfigType == EConfigType.Custom)
+        {
+            await CoreStartPreService(preContext, isFirst: true);
+            await WaitForProxyPort(preContext);
+            await CoreStart(mainContext);
+        }
+        else
+        {
+            await CoreStart(mainContext);
+            await WaitForProxyPort(preContext);
+            await CoreStartPreService(preContext);
+        }
 
         AppManager.Instance.RunningCoreType = preContext?.RunCoreType ?? mainContext.RunCoreType;
 
@@ -190,7 +199,7 @@ public class CoreManager
         var coreType = AppManager.Instance.GetCoreType(node, node.ConfigType);
         var coreInfo = CoreInfoManager.Instance.GetCoreInfo(coreType);
 
-        var displayLog = node.ConfigType != EConfigType.Custom || node.DisplayLog;
+        var displayLog = node.ConfigType != EConfigType.Custom || node.DisplayLog || node.CoreType is ECoreType.psiphon or ECoreType.aether;
         var proc = await RunProcess(coreInfo, Global.CoreConfigFileName, displayLog, true, context.IsTunEnabled, node);
         if (proc is null)
         {
@@ -199,9 +208,9 @@ public class CoreManager
         _processService = proc;
     }
 
-    private async Task CoreStartPreService(CoreConfigContext? preContext)
+    private async Task CoreStartPreService(CoreConfigContext? preContext, bool isFirst = false)
     {
-        if (_processService is { HasExited: false } && preContext != null)
+        if ((isFirst || _processService is { HasExited: false }) && preContext != null)
         {
             var preCoreType = preContext?.Node?.CoreType ?? ECoreType.sing_box;
             var fileName = Utils.GetBinConfigPath(Global.CorePreConfigFileName);
@@ -209,7 +218,8 @@ public class CoreManager
             if (result.Success)
             {
                 var coreInfo = CoreInfoManager.Instance.GetCoreInfo(preCoreType);
-                var proc = await RunProcess(coreInfo, Global.CorePreConfigFileName, true, true, preContext.IsTunEnabled);
+                var displayLog = preContext.Node.ConfigType != EConfigType.Custom || preContext.Node.DisplayLog || preContext.Node.CoreType is ECoreType.psiphon or ECoreType.aether;
+                var proc = await RunProcess(coreInfo, Global.CorePreConfigFileName, displayLog, true, preContext.IsTunEnabled, preContext.Node);
                 if (proc is null)
                 {
                     return;
@@ -234,7 +244,9 @@ public class CoreManager
         using var rootCts = new CancellationTokenSource(TimeSpan.FromSeconds(20));
         var rootToken = rootCts.Token;
 
-        var port = preContext.Node.Port;
+        var port = preContext.Node.ConfigType == EConfigType.Custom
+            ? (preContext.Node.PreSocksPort is > 0 and <= 65535 ? preContext.Node.PreSocksPort.Value : (preContext.Node.CoreType == ECoreType.aether ? 1819 : 1080))
+            : preContext.Node.Port;
         // SOCKS5 client greeting: VER=5, NMETHODS=1, METHOD=0x00 (no auth)
         ReadOnlyMemory<byte> greeting = new byte[] { 0x05, 0x01, 0x00 };
         var buf = new byte[2];
@@ -406,6 +418,17 @@ public class CoreManager
             }
             environmentVars["AETHER_BIND"] = $"127.0.0.1:{socksPort}";
             environmentVars["AETHER_SOCKS"] = socksPort.ToString();
+        }
+
+        if (coreInfo.CoreType == ECoreType.psiphon)
+        {
+            var dataDir = Path.Combine(Utils.GetBinConfigPath(), "psiphon_data");
+            if (!Directory.Exists(dataDir))
+            {
+                Directory.CreateDirectory(dataDir);
+            }
+            var absConfig = Utils.GetBinConfigPath(configPath);
+            arguments = $"-config {absConfig.AppendQuotes()} -dataRootDirectory {dataDir.AppendQuotes()} -formatNotices";
         }
 
         var procService = new ProcessService(

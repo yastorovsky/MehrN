@@ -283,7 +283,7 @@
                                 <MenuItem
                                     x:Name="menuPsiphonSetting"
                                     Height="{StaticResource MenuItemHeight}"
-                                    Header="Psiphon Settings" />
+                                    Header="Psiphon Shirokhorshid Settings" />
                                 <MenuItem
                                     x:Name="menuStopMhr"
                                     Height="{StaticResource MenuItemHeight}"

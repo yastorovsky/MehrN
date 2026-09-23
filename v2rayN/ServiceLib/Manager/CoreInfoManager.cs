@@ -41,6 +41,12 @@ public sealed class CoreInfoManager
                 fileName = vName;
                 break;
             }
+            var rootName = Utils.GetBinPath(Utils.GetExeName(name));
+            if (File.Exists(rootName))
+            {
+                fileName = rootName;
+                break;
+            }
         }
         if (fileName.IsNullOrEmpty())
         {
@@ -354,8 +360,9 @@ public sealed class CoreInfoManager
                 {
                     CoreType = ECoreType.psiphon,
                     CoreExes = [ "psiphon-tunnel-core-x86_64", "psiphon-tunnel-core-amd64", "psiphon-tunnel-core", "psiphon" ],
-                    Arguments = "-config {0}",
+                    Arguments = "-config {0} -formatNotices",
                     Url = GetCoreUrl(ECoreType.psiphon),
+                    AbsolutePath = true,
                     DownloadUrlWin64 = GetCoreUrl(ECoreType.psiphon) + "/download/{0}/psiphon-tunnel-core-x86_64.exe",
                     DownloadUrlLinux64 = GetCoreUrl(ECoreType.psiphon) + "/download/{0}/psiphon-tunnel-core-x86_64",
                     DownloadUrlLinuxArm64 = GetCoreUrl(ECoreType.psiphon) + "/download/{0}/psiphon-tunnel-core-aarch64",

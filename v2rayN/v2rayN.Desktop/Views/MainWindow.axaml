@@ -105,7 +105,7 @@
                     <MenuItem Header="L.C Settings">
                         <MenuItem x:Name="menuSniSpoofingSetting" Header="SNI Spoofing Settings" />
                         <MenuItem x:Name="menuMhrSetting" Header="MHR Settings" />
-                        <MenuItem x:Name="menuPsiphonSetting" Header="Psiphon Settings" />
+                        <MenuItem x:Name="menuPsiphonSetting" Header="Psiphon Shirokhorshid Settings" />
                         <MenuItem x:Name="menuStopMhr" Header="Stop MHR" />
                         <Separator />
                         <MenuItem x:Name="menuLcCloudflareScanner" Header="{x:Static resx:ResUI.menuCloudflareScanner}" />

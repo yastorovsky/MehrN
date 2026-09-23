@@ -598,7 +598,8 @@ public partial class MainWindowViewModel : MyReactiveObject
             PreSocksPort = 1080,
             Address = Global.Loopback,
             Port = 1080,
-            Remarks = "Psiphon",
+            DisplayLog = true,
+            Remarks = "Psiphon Shirokhorshid",
         };
 
         var addPsiphonServerViewModel = new AddPsiphonServerViewModel(item);

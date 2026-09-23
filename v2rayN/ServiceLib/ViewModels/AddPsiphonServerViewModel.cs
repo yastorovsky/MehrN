@@ -44,7 +44,7 @@ public partial class AddPsiphonServerViewModel : MyReactiveObject, ICloseable
 
         if (SelectedSource.Remarks.IsNullOrEmpty())
         {
-            SelectedSource.Remarks = "Psiphon";
+            SelectedSource.Remarks = "Psiphon Shirokhorshid";
         }
 
         SaveServerCmd = ReactiveCommand.CreateFromTask(async () =>

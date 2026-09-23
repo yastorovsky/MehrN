@@ -4,7 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:resx="clr-namespace:ServiceLib.Resx;assembly=ServiceLib"
     xmlns:vms="clr-namespace:ServiceLib.ViewModels;assembly=ServiceLib"
-    Title="Psiphon Settings"
+    Title="Psiphon Shirokhorshid Settings"
     Width="580"
     Height="520"
     x:DataType="vms:PsiphonSettingViewModel"
@@ -17,7 +17,7 @@
         </StackPanel>
         <ScrollViewer>
             <StackPanel Spacing="12">
-                <TextBlock FontSize="18" FontWeight="SemiBold" Text="Psiphon Core Settings (shirokhorshid)" />
+                <TextBlock FontSize="18" FontWeight="SemiBold" Text="Psiphon Shirokhorshid Core Settings" />
                 <TextBlock TextWrapping="Wrap" Opacity="0.8" Text="Configure global defaults for the Psiphon tunnel core, including CDN fronting scan parameters, egress regions, and multi-tunnel pool size." />
                 
                 <CheckBox IsChecked="{Binding CdnFrontingEnabled}" Content="Enable CDN fronting (domain fronting scan via CDN)" />

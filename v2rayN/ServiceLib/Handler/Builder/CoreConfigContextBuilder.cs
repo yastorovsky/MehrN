@@ -192,7 +192,7 @@ public class CoreConfigContextBuilder
         var node = nodeContext.Node;
         var coreType = AppManager.Instance.GetCoreType(node, node.ConfigType);
 
-        var preSocksItem = ConfigHandler.GetPreSocksItem(config, node, coreType);
+        var preSocksItem = await ConfigHandler.GetPreSocksItem(config, node, coreType);
         if (preSocksItem != null)
         {
             var preSocksResult = await Build(nodeContext.AppConfig, preSocksItem);

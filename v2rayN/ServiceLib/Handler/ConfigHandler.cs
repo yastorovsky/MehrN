@@ -1665,7 +1665,7 @@ public static class ConfigHandler
     /// <param name="node">Server node that might need pre-SOCKS</param>
     /// <param name="coreType">Core type being used</param>
     /// <returns>A SOCKS profile item or null if not needed</returns>
-    public static ProfileItem? GetPreSocksItem(Config config, ProfileItem node, ECoreType coreType)
+    public static async Task<ProfileItem?> GetPreSocksItem(Config config, ProfileItem node, ECoreType coreType)
     {
         ProfileItem? itemSocks = null;
         var enableLegacyProtect = config.TunModeItem.EnableLegacyProtect;
@@ -1694,6 +1694,16 @@ public static class ConfigHandler
                 Address = Global.Loopback,
                 Port = node.PreSocksPort.Value,
             };
+        }
+        else if (node.ConfigType == EConfigType.ProxyChain)
+        {
+            var childIds = Utils.String2List(node.GetProtocolExtra()?.ChildItems) ?? [];
+            var children = await AppManager.Instance.GetProfileItemsByIndexIds(childIds);
+            var customChild = children?.FirstOrDefault(c => c.ConfigType == EConfigType.Custom && c.CoreType is ECoreType.aether or ECoreType.psiphon);
+            if (customChild != null)
+            {
+                itemSocks = customChild;
+            }
         }
         return itemSocks;
     }

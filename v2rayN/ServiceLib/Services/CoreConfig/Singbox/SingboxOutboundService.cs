@@ -101,6 +101,15 @@ public partial class CoreConfigSingboxService
     {
         try
         {
+            if (_node.ConfigType == EConfigType.Custom)
+            {
+                var socksPort = _node.PreSocksPort is > 0 and <= 65535 ? _node.PreSocksPort.Value : (_node.CoreType == ECoreType.aether ? 1819 : 1080);
+                outbound.server = Global.Loopback;
+                outbound.server_port = socksPort;
+                outbound.type = "socks";
+                return;
+            }
+
             var protocolExtra = _node.GetProtocolExtra();
             var transportExtra = _node.GetTransportExtra();
             var network = _node.GetNetwork();

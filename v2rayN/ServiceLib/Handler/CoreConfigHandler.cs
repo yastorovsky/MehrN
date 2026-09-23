@@ -172,10 +172,17 @@ public static class CoreConfigHandler
                 ? extra.PsiphonCdnFrontingEdges
                 : (globalPsiphon?.CdnFrontingEdges ?? "");
 
+            var dataDir = Path.Combine(Utils.GetBinConfigPath(), "psiphon_data");
+            if (!Directory.Exists(dataDir))
+            {
+                Directory.CreateDirectory(dataDir);
+            }
+
             var psiphonConfig = new Dictionary<string, object?>
             {
-                ["SocksProxyPort"] = socksPort,
+                ["LocalSocksProxyPort"] = socksPort,
                 ["LocalHttpProxyPort"] = httpPort,
+                ["DataRootDirectory"] = dataDir,
                 ["EgressRegion"] = egressRegion,
                 ["TunnelPoolSize"] = poolSize,
                 ["EmitDiagnosticNotices"] = true,

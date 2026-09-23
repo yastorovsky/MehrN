@@ -6,7 +6,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:resx="clr-namespace:ServiceLib.Resx;assembly=ServiceLib"
     xmlns:vms="clr-namespace:ServiceLib.ViewModels;assembly=ServiceLib"
-    Title="Psiphon Server"
+    Title="Psiphon Shirokhorshid Server"
     Width="650"
     Height="520"
     x:DataType="vms:AddPsiphonServerViewModel"
