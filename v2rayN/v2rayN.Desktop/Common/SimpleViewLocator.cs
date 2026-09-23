@@ -15,7 +15,6 @@ public class SimpleViewLocator : IDataTemplate
     private SimpleViewLocator()
     {
         RegisterViewFactory<AddAetherServerViewModel, AddAetherServerWindow>();
-        RegisterViewFactory<AddPsiphonServerViewModel, AddPsiphonServerWindow>();
         RegisterViewFactory<AddGroupServerViewModel, AddGroupServerWindow>();
         RegisterViewFactory<AddServer2ViewModel, AddServer2Window>();
         RegisterViewFactory<AddServerViewModel, AddServerWindow>();

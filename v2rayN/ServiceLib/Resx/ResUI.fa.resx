@@ -567,21 +567,6 @@
   <data name="menuAddAetherServer" xml:space="preserve">
     <value>افزودن سرور [Aether]</value>
   </data>
-  <data name="menuAddPsiphonServer" xml:space="preserve">
-    <value>افزودن سرور [Psiphon]</value>
-  </data>
-  <data name="titlePsiphonServer" xml:space="preserve">
-    <value>سرور Psiphon</value>
-  </data>
-  <data name="TbPsiphonEgressRegion" xml:space="preserve">
-    <value>منطقه خروجی (کشور)</value>
-  </data>
-  <data name="TbPsiphonTunnelPool" xml:space="preserve">
-    <value>اندازه استخر تونل</value>
-  </data>
-  <data name="TbPsiphonLocalSocksPort" xml:space="preserve">
-    <value>پورت محلی SOCKS</value>
-  </data>
   <data name="menuAddCustomServer" xml:space="preserve">
     <value>یک سرور پیکربندی سفارشی اضافه شود</value>
   </data>

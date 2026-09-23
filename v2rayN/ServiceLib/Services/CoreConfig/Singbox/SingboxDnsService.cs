@@ -153,6 +153,7 @@ public partial class CoreConfigSingboxService
 
         _coreConfig.dns.rules.Add(new()
         {
+            preferred_by = Global.SingboxHostsDNSTag,
             server = Global.SingboxHostsDNSTag,
         });
 

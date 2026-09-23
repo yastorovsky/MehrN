@@ -61,8 +61,4 @@ public record ProtocolExtraItem
     public string? AetherScan { get; init; }
     public string? AetherNoize { get; init; }
     public string? AetherPeer { get; init; }
-
-    // psiphon
-    public string? PsiphonEgressRegion { get; init; }
-    public int? PsiphonTunnelPoolSize { get; init; }
 }

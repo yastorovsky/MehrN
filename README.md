@@ -5,9 +5,12 @@
 <h1 align="center">MehrON</h1>
 
 <p align="center">
-  <a href="https://github.com/yastorovsky/MehrON/releases"><img src="https://img.shields.io/github/v/release/yastorovsky/MehrON?include_prereleases&label=download" alt="Release" /></a>
+  <a href="https://github.com/yastorovsky/MehrON/releases/tag/v7.25.47"><img src="https://img.shields.io/badge/download-v7.25.47-green" alt="Download" /></a>
   <a href="https://github.com/yastorovsky/MehrON/releases"><img src="https://img.shields.io/github/downloads/yastorovsky/MehrON/total?label=downloads" alt="Downloads" /></a>
+  <a href="https://github.com/yastorovsky/MehrON/actions/workflows/build.yml"><img src="https://github.com/yastorovsky/MehrON/actions/workflows/build.yml/badge.svg" alt="Build" /></a>
+  <a href="https://github.com/yastorovsky/MehrON/actions/workflows/test.yml"><img src="https://github.com/yastorovsky/MehrON/actions/workflows/test.yml/badge.svg" alt="Tests" /></a>
   <img src="https://img.shields.io/badge/platform-Windows%20x64-blue" alt="Platform" />
+  <img src="https://img.shields.io/badge/platform-Linux%20x64-orange" alt="Linux" />
   <img src="https://img.shields.io/badge/.NET-10.0-purple" alt=".NET 10" />
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-GPL--3.0-green" alt="License" /></a>
 </p>

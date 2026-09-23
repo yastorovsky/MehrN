@@ -28,16 +28,9 @@ public class CoreManager
         {
             var fromPath = Utils.GetBaseDirectory("bin");
             var toPath = Utils.GetBinPath("");
-            if (fromPath != toPath && Directory.Exists(fromPath))
+            if (fromPath != toPath)
             {
-                try
-                {
-                    FileUtils.CopyDirectory(fromPath, toPath, true, true);
-                }
-                catch (Exception ex)
-                {
-                    Logging.SaveLog(_tag, ex);
-                }
+                FileUtils.CopyDirectory(fromPath, toPath, true, false);
             }
         }
 
@@ -413,16 +406,6 @@ public class CoreManager
             }
             environmentVars["AETHER_BIND"] = $"127.0.0.1:{socksPort}";
             environmentVars["AETHER_SOCKS"] = socksPort.ToString();
-        }
-
-        if (coreInfo?.CoreType == ECoreType.psiphon)
-        {
-            var dataDir = Path.Combine(Utils.GetBinConfigPath(), "psiphon_data");
-            if (!Directory.Exists(dataDir))
-            {
-                Directory.CreateDirectory(dataDir);
-            }
-            arguments = $"{arguments} -dataRootDirectory {dataDir.AppendQuotes()}";
         }
 
         var procService = new ProcessService(

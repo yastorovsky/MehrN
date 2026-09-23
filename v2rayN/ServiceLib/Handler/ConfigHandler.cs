@@ -320,10 +320,6 @@ public static class ConfigHandler
         {
             return await AddAetherServer(config, item);
         }
-        if (item.CoreType == ECoreType.psiphon)
-        {
-            return await AddPsiphonServer(config, item);
-        }
 
         var ret = item.ConfigType switch
         {
@@ -653,38 +649,6 @@ public static class ConfigHandler
 
         item.ConfigType = EConfigType.Custom;
         item.CoreType = ECoreType.aether;
-        if (item.Address.IsNullOrEmpty())
-        {
-            item.Address = Global.Loopback;
-        }
-
-        await AddServerCommon(config, item, true);
-        return 0;
-    }
-
-    /// <summary>
-    /// Add or edit a Psiphon server
-    /// </summary>
-    public static async Task<int> AddPsiphonServer(Config config, ProfileItem profileItem)
-    {
-        var item = await AppManager.Instance.GetProfileItem(profileItem.IndexId);
-        if (item is null)
-        {
-            item = profileItem;
-        }
-        else
-        {
-            item.Remarks = profileItem.Remarks;
-            item.Address = profileItem.Address;
-            item.Port = profileItem.Port;
-            item.CoreType = profileItem.CoreType;
-            item.DisplayLog = profileItem.DisplayLog;
-            item.PreSocksPort = profileItem.PreSocksPort;
-            item.ProtoExtra = profileItem.ProtoExtra;
-        }
-
-        item.ConfigType = EConfigType.Custom;
-        item.CoreType = ECoreType.psiphon;
         if (item.Address.IsNullOrEmpty())
         {
             item.Address = Global.Loopback;
@@ -1667,9 +1631,11 @@ public static class ConfigHandler
     public static ProfileItem? GetPreSocksItem(Config config, ProfileItem node, ECoreType coreType)
     {
         ProfileItem? itemSocks = null;
+        var enableLegacyProtect = config.TunModeItem.EnableLegacyProtect;
         if (node.ConfigType != EConfigType.Custom
             && coreType != ECoreType.sing_box
-            && config.TunModeItem.EnableTun)
+            && config.TunModeItem.EnableTun
+            && enableLegacyProtect)
         {
             itemSocks = new ProfileItem()
             {
@@ -1683,7 +1649,7 @@ public static class ConfigHandler
             && node.PreSocksPort is > 0 and <= 65535)
         {
             var customPreCoreType = AppManager.Instance.GetCoreType(null, EConfigType.Custom);
-            var preCoreType = config.TunModeItem.EnableTun ? ECoreType.sing_box : customPreCoreType;
+            var preCoreType = (enableLegacyProtect && config.TunModeItem.EnableTun) ? ECoreType.sing_box : customPreCoreType;
             itemSocks = new ProfileItem()
             {
                 CoreType = preCoreType,

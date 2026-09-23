@@ -188,14 +188,7 @@ public static class FileUtils
             {
                 continue;
             }
-            try
-            {
-                _ = file.CopyTo(targetFilePath, overwrite);
-            }
-            catch (Exception ex)
-            {
-                Logging.SaveLog(_tag, ex);
-            }
+            _ = file.CopyTo(targetFilePath, overwrite);
         }
 
         // If recursive and copying subdirectories, recursively call this method

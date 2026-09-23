@@ -790,51 +790,6 @@ namespace ServiceLib.Resx {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Add [Psiphon] server.
-        /// </summary>
-        public static string menuAddPsiphonServer {
-            get {
-                return ResourceManager.GetString("menuAddPsiphonServer", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Psiphon Server.
-        /// </summary>
-        public static string titlePsiphonServer {
-            get {
-                return ResourceManager.GetString("titlePsiphonServer", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Egress Region (Country).
-        /// </summary>
-        public static string TbPsiphonEgressRegion {
-            get {
-                return ResourceManager.GetString("TbPsiphonEgressRegion", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Tunnel Pool Size.
-        /// </summary>
-        public static string TbPsiphonTunnelPool {
-            get {
-                return ResourceManager.GetString("TbPsiphonTunnelPool", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Local SOCKS Port.
-        /// </summary>
-        public static string TbPsiphonLocalSocksPort {
-            get {
-                return ResourceManager.GetString("TbPsiphonLocalSocksPort", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   查找类似 Add a custom configuration 的本地化字符串。
         /// </summary>
         public static string menuAddCustomServer {
