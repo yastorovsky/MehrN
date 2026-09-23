@@ -541,8 +541,11 @@ jobs:
           find ./dist/MehrON-linux-64/bin -type f -exec chmod +x {} + || true
           tar -czf ./MehrON-linux-64.tar.gz -C ./dist/MehrON-linux-64 .
           (cd ./dist/MehrON-linux-64 && zip -q -r ../../MehrON-linux-64.zip .)
+          cp -f ./MehrON-linux-64.tar.gz ./MehrON-FM-Edition-nixos-64.tar.gz
+          cp -f ./MehrON-linux-64.tar.gz ./MehrON-FM-Edition-linux-64.tar.gz
           echo "Linux package: MehrON-linux-64.tar.gz ($(du -h MehrON-linux-64.tar.gz | cut -f1))"
           echo "Linux package: MehrON-linux-64.zip ($(du -h MehrON-linux-64.zip | cut -f1))"
+          echo "NixOS FM Edition package: MehrON-FM-Edition-nixos-64.tar.gz ($(du -h MehrON-FM-Edition-nixos-64.tar.gz | cut -f1))"
 
       - name: Create or Update GitHub Release
         uses: softprops/action-gh-release@v2
@@ -551,10 +554,12 @@ jobs:
           tag_name: ${{ env.TAG_NAME }}
           target_commitish: ${{ github.ref_name }}
           body: |
-            ## MehrON ${{ env.TAG_NAME }}
+            ## MehrON ${{ env.TAG_NAME }} (FM Edition)
 
             ### ✨ Improvements & Highlights
-            - **⚡ Native Architecture**: Unified and refined native runtime for Windows and Linux (Ubuntu / Debian).
+            - **🌸 FM Edition Branding**: Special edition branding across application interface, CLI versioning, and desktop entries.
+            - **❄️ First-Class NixOS Support**: Native integration via Nix Flakes, derivation, and NixOS module.
+            - **⚡ Native Architecture**: Unified and refined native runtime for Windows and Linux (Ubuntu / Debian / NixOS).
             - **🐧 Linux (Ubuntu / Debian x64) Support**: Native cross-platform desktop client release with bundled Linux cores, portable archives, and official .deb package.
             - **🌐 Aether Engine Integration**: Built-in support, dedicated 1-click server window, and distribution for the Aether censorship circumvention core (MASQUE, WireGuard, and pluggable transports).
             - **🧠 Memory & Performance Optimizations**: Active working-set management and dynamic heap tuning for a lightweight background footprint.
@@ -562,12 +567,14 @@ jobs:
             - **📦 Core Engines & Routing**: Updated high-performance core binaries and latest geo-routing rules.
 
             ---
-            *Platforms: Windows x64 (Portable), Linux x64 (Ubuntu / Debian .deb & portable)*
+            *Platforms: Windows x64 (Portable), Linux x64 (Ubuntu / Debian .deb & portable), NixOS (MehrON-FM-Edition-nixos-64.tar.gz & Flake)*
           files: |
             MehrON-windows-64.zip
             MehrON-linux-64.tar.gz
             MehrON-linux-64.zip
             MehrON-linux-amd64.deb
             MehrON-linux-64.deb
+            MehrON-FM-Edition-nixos-64.tar.gz
+            MehrON-FM-Edition-linux-64.tar.gz
           draft: false
           prerelease: ${{ github.ref_name == 'Beta' }}

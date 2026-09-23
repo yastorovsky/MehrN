@@ -134,6 +134,9 @@ Or install to user environment:
 nix profile install github:yastorovsky/MehrON/Beta#default
 ```
 
+### 📥 Direct Release Tarball
+You can also download the standalone **`MehrON-FM-Edition-nixos-64.tar.gz`** archive directly from [GitHub Releases](https://github.com/yastorovsky/MehrON/releases).
+
 ## Build from source
 
 Requirements:
