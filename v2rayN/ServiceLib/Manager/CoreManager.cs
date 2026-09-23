@@ -1,4 +1,5 @@
 using System.Text.Json;
+using ServiceLib.ViewModels;
 
 namespace ServiceLib.Manager;
 
@@ -348,20 +349,21 @@ public class CoreManager
 
     private async Task<ProcessService?> StartCustomChildCore(ProfileItem node, string configFileName, string? upstreamProxy = null)
     {
-        var coreType = node.CoreType;
+        var coreType = AppManager.Instance.GetCoreType(node, node.ConfigType);
         var fullConfigPath = Utils.GetBinConfigPath(configFileName);
         RetResult result;
-        if (coreType == ECoreType.psiphon)
+        if (node.CoreType == ECoreType.psiphon)
         {
             result = await CoreConfigHandler.GenerateClientPsiphonConfig(node, fullConfigPath, upstreamProxy);
         }
-        else if (coreType == ECoreType.aether)
+        else if (node.CoreType == ECoreType.aether)
         {
             result = await CoreConfigHandler.GenerateClientAetherConfig(node, fullConfigPath);
         }
         else
         {
-            result = await CoreConfigHandler.GenerateClientConfig(new CoreConfigContext { Node = node }, fullConfigPath);
+            var (ctx, _) = await CoreConfigContextBuilder.Build(_config, node);
+            result = await CoreConfigHandler.GenerateClientConfig(ctx, fullConfigPath);
         }
 
         if (!result.Success)
@@ -371,7 +373,7 @@ public class CoreManager
         }
 
         var coreInfo = CoreInfoManager.Instance.GetCoreInfo(coreType);
-        var displayLog = node.DisplayLog || coreType is ECoreType.psiphon or ECoreType.aether;
+        var displayLog = node.DisplayLog || node.CoreType is ECoreType.psiphon or ECoreType.aether;
         return await RunProcess(coreInfo, configFileName, displayLog, false, false, node, upstreamProxy);
     }
 
