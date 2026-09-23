@@ -19,6 +19,7 @@ public static class CoreConfigHandler
             {
                 ECoreType.mihomo => await new CoreConfigClashService(config, context.IsTunEnabled).GenerateClientCustomConfig(node, fileName),
                 ECoreType.aether => await GenerateClientAetherConfig(node, fileName),
+                ECoreType.psiphon => await GenerateClientPsiphonConfig(node, fileName),
                 _ => await GenerateClientCustomConfig(node, fileName)
             };
         }
@@ -124,6 +125,82 @@ public static class CoreConfigHandler
                 // Write a base identity stub so Aether initializes seamlessly
                 await File.WriteAllTextAsync(fileName, "# Aether Configuration\n");
             }
+
+            ret.Msg = string.Format(ResUI.SuccessfulConfiguration, "");
+            ret.Success = true;
+            return ret;
+        }
+        catch (Exception ex)
+        {
+            Logging.SaveLog(_tag, ex);
+            ret.Msg = ResUI.FailedGenDefaultConfiguration;
+            return ret;
+        }
+    }
+
+    private static async Task<RetResult> GenerateClientPsiphonConfig(ProfileItem node, string? fileName)
+    {
+        var ret = new RetResult();
+        try
+        {
+            if (node == null || fileName is null)
+            {
+                ret.Msg = ResUI.CheckServerSettings;
+                return ret;
+            }
+
+            if (File.Exists(fileName))
+            {
+                File.SetAttributes(fileName, FileAttributes.Normal);
+                File.Delete(fileName);
+            }
+
+            var extra = node.GetProtocolExtra();
+            var globalPsiphon = AppManager.Instance.Config.PsiphonItem;
+
+            // Build Psiphon JSON config (shirokhorshid fork compatible)
+            var socksPort = node.PreSocksPort is > 0 and <= 65535 ? node.PreSocksPort.Value : 1080;
+            var httpPort = socksPort + 1;
+            var egressRegion = extra?.PsiphonEgressRegion.IsNotEmpty() == true
+                ? extra.PsiphonEgressRegion
+                : (globalPsiphon?.DefaultEgressRegion ?? "");
+            var poolSize = (extra?.PsiphonTunnelPoolSize is > 0)
+                ? extra.PsiphonTunnelPoolSize.Value
+                : (globalPsiphon?.DefaultTunnelPoolSize is > 0 ? globalPsiphon.DefaultTunnelPoolSize : 1);
+            var cdnFronting = extra?.PsiphonCdnFronting ?? globalPsiphon?.CdnFrontingEnabled ?? false;
+            var cdnEdges = extra?.PsiphonCdnFrontingEdges.IsNotEmpty() == true
+                ? extra.PsiphonCdnFrontingEdges
+                : (globalPsiphon?.CdnFrontingEdges ?? "");
+
+            var psiphonConfig = new Dictionary<string, object?>
+            {
+                ["SocksProxyPort"] = socksPort,
+                ["LocalHttpProxyPort"] = httpPort,
+                ["EgressRegion"] = egressRegion,
+                ["TunnelPoolSize"] = poolSize,
+                ["EmitDiagnosticNotices"] = true,
+                ["PropagationChannelId"] = "FFFFFFFFFFFFFFFF",
+                ["SponsorId"] = "FFFFFFFFFFFFFFFF",
+                ["DisableLocalSocksProxy"] = false,
+                ["DisableLocalHTTPProxy"] = false,
+            };
+
+            // CDN fronting fields (shirokhorshid fork feature)
+            if (cdnFronting && cdnEdges.IsNotEmpty())
+            {
+                // Parse user-supplied edge IPs/CIDRs/SNI; comma- or newline-separated
+                var edges = cdnEdges
+                    .Split(new[] { ',', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                    .ToList();
+
+                psiphonConfig["CdnFrontingSpecs"] = edges.Select(e => new Dictionary<string, string>
+                {
+                    ["Address"] = e
+                }).ToList<object>();
+            }
+
+            var json = JsonUtils.Serialize(psiphonConfig);
+            await File.WriteAllTextAsync(fileName, json);
 
             ret.Msg = string.Format(ResUI.SuccessfulConfiguration, "");
             ret.Success = true;

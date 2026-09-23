@@ -567,6 +567,9 @@
   <data name="menuAddAetherServer" xml:space="preserve">
     <value>افزودن سرور [Aether]</value>
   </data>
+  <data name="menuAddPsiphonServer" xml:space="preserve">
+    <value>افزودن سرور [Psiphon]</value>
+  </data>
   <data name="menuAddCustomServer" xml:space="preserve">
     <value>یک سرور پیکربندی سفارشی اضافه شود</value>
   </data>

@@ -17,5 +17,6 @@ public enum ECoreType
     shadowquic = 29,
     mieru = 30,
     aether = 31,
+    psiphon = 32,
     v2rayN = 99
 }

@@ -567,6 +567,9 @@
   <data name="menuAddAetherServer" xml:space="preserve">
     <value>Add [Aether] server</value>
   </data>
+  <data name="menuAddPsiphonServer" xml:space="preserve">
+    <value>Add [Psiphon] server</value>
+  </data>
   <data name="menuAddCustomServer" xml:space="preserve">
     <value>Add a custom configuration</value>
   </data>

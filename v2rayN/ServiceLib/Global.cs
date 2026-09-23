@@ -687,6 +687,7 @@ public class Global
         { ECoreType.shadowquic, "spongebob888/shadowquic" },
         { ECoreType.mieru, "enfein/mieru" },
         { ECoreType.aether, "CluvexStudio/Aether" },
+        { ECoreType.psiphon, "shirokhorshid/psiphon-tunnel-core" },
         { ECoreType.v2rayN, "yastorovsky/MehrON" },
     };
 
@@ -811,5 +812,36 @@ public class Global
         "fc00::10:10:14:1/126",
         "fc00::10:1:0:1/126",
         "fc00::10:0:0:1/126",
+    ];
+
+    // Psiphon egress regions (empty string = Psiphon selects best)
+    public static readonly List<string> PsiphonEgressRegions =
+    [
+        "",
+        "US",
+        "CA",
+        "GB",
+        "DE",
+        "FR",
+        "NL",
+        "JP",
+        "SG",
+        "AU",
+        "SE",
+        "CH",
+        "NO",
+        "AT",
+        "BE",
+        "DK",
+        "FI",
+        "IE",
+        "IT",
+        "ES",
+        "PT",
+        "BR",
+        "IN",
+        "KR",
+        "TW",
+        "HK",
     ];
 }

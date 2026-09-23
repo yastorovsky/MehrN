@@ -1,0 +1,168 @@
+<Window
+    x:Class="v2rayN.Desktop.Views.AddPsiphonServerWindow"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:resx="clr-namespace:ServiceLib.Resx;assembly=ServiceLib"
+    xmlns:vms="clr-namespace:ServiceLib.ViewModels;assembly=ServiceLib"
+    Title="Psiphon Server"
+    Width="650"
+    Height="520"
+    x:DataType="vms:AddPsiphonServerViewModel"
+    ShowInTaskbar="False"
+    WindowStartupLocation="CenterScreen"
+    mc:Ignorable="d">
+    <DockPanel Margin="{StaticResource Margin8}">
+        <StackPanel
+            Margin="{StaticResource Margin4}"
+            HorizontalAlignment="Center"
+            DockPanel.Dock="Bottom"
+            Orientation="Horizontal">
+            <Button
+                x:Name="btnSave"
+                Width="100"
+                Content="{x:Static resx:ResUI.TbConfirm}"
+                IsDefault="True" />
+            <Button
+                x:Name="btnCancel"
+                Width="100"
+                Margin="{StaticResource MarginLr8}"
+                Content="{x:Static resx:ResUI.TbCancel}"
+                IsCancel="True" />
+        </StackPanel>
+        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+            <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+
+                <TextBlock
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    Margin="{StaticResource Margin8}"
+                    FontWeight="SemiBold"
+                    Text="Psiphon Tunnel Core (CDN Fronting Edition)" />
+
+                <!-- Remarks -->
+                <TextBlock
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Margin="{StaticResource Margin8}"
+                    VerticalAlignment="Center"
+                    Text="{x:Static resx:ResUI.TbRemarks}" />
+                <TextBox
+                    x:Name="txtRemarks"
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Width="380"
+                    Margin="{StaticResource Margin4}"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center" />
+
+                <!-- Egress Region -->
+                <TextBlock
+                    Grid.Row="2"
+                    Grid.Column="0"
+                    Margin="{StaticResource Margin8}"
+                    VerticalAlignment="Center"
+                    Text="Egress Region" />
+                <ComboBox
+                    x:Name="cmbEgressRegion"
+                    Grid.Row="2"
+                    Grid.Column="1"
+                    Width="200"
+                    Margin="{StaticResource Margin4}"
+                    HorizontalAlignment="Left" />
+
+                <!-- Tunnel Pool Size -->
+                <TextBlock
+                    Grid.Row="3"
+                    Grid.Column="0"
+                    Margin="{StaticResource Margin8}"
+                    VerticalAlignment="Center"
+                    Text="Tunnel Pool Size" />
+                <TextBox
+                    x:Name="txtPoolSize"
+                    Grid.Row="3"
+                    Grid.Column="1"
+                    Width="100"
+                    Margin="{StaticResource Margin4}"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center" />
+
+                <!-- CDN Fronting Enable -->
+                <TextBlock
+                    Grid.Row="4"
+                    Grid.Column="0"
+                    Margin="{StaticResource Margin8}"
+                    VerticalAlignment="Center"
+                    Text="CDN Fronting" />
+                <ToggleSwitch
+                    x:Name="togCdnFronting"
+                    Grid.Row="4"
+                    Grid.Column="1"
+                    Margin="{StaticResource Margin4}"
+                    HorizontalAlignment="Left" />
+
+                <!-- CDN Fronting Edges -->
+                <TextBlock
+                    Grid.Row="5"
+                    Grid.Column="0"
+                    Margin="{StaticResource Margin8}"
+                    VerticalAlignment="Top"
+                    Text="Edge IPs / CIDRs / SNI" />
+                <TextBox
+                    x:Name="txtCdnEdges"
+                    Grid.Row="5"
+                    Grid.Column="1"
+                    Width="380"
+                    Height="80"
+                    Margin="{StaticResource Margin4}"
+                    AcceptsReturn="True"
+                    HorizontalAlignment="Left"
+                    TextWrapping="Wrap"
+                    VerticalAlignment="Top"
+                    Watermark="Comma or newline separated: 104.18.0.0/13, example.cdn.com ..." />
+
+                <!-- Local SOCKS Port -->
+                <TextBlock
+                    Grid.Row="6"
+                    Grid.Column="0"
+                    Margin="{StaticResource Margin8}"
+                    VerticalAlignment="Center"
+                    Text="Local SOCKS Port" />
+                <TextBox
+                    x:Name="txtPort"
+                    Grid.Row="6"
+                    Grid.Column="1"
+                    Width="160"
+                    Margin="{StaticResource Margin4}"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center" />
+
+                <!-- Display Log -->
+                <TextBlock
+                    Grid.Row="7"
+                    Grid.Column="0"
+                    Margin="{StaticResource Margin8}"
+                    VerticalAlignment="Center"
+                    Text="{x:Static resx:ResUI.TbDisplayLog}" />
+                <ToggleSwitch
+                    x:Name="togDisplayLog"
+                    Grid.Row="7"
+                    Grid.Column="1"
+                    Margin="{StaticResource Margin4}"
+                    HorizontalAlignment="Left" />
+
+                <!-- Info note -->
+                <TextBlock
+                    Grid.Row="8"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    Margin="{StaticResource Margin8}"
+                    FontStyle="Italic"
+                    Opacity="0.6"
+                    Text="Psiphon will expose a local SOCKS5/HTTP proxy. CDN Fronting requires the shirokhorshid fork binary." />
+            </Grid>
+        </ScrollViewer>
+    </DockPanel>
+</Window>

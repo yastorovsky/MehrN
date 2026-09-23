@@ -41,6 +41,11 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 'stable'
+
       - name: Resolve Version
         id: version_step
         shell: pwsh
@@ -94,7 +99,7 @@ jobs:
       - name: Bundle Core Binaries
         shell: pwsh
         run: |
-          $outDir = "./dist/MehrON-windows-64"
+          $outDir = "$((Get-Location).Path)/dist/MehrON-windows-64"
           $binDir = "$outDir/bin"
           New-Item -ItemType Directory -Path "$binDir/xray" -Force | Out-Null
           New-Item -ItemType Directory -Path "$binDir/sing_box" -Force | Out-Null
@@ -199,6 +204,16 @@ jobs:
             }
           }
 
+          # Build latest psiphon-tunnel-core from shirokhorshid fork
+          Write-Host "Building psiphon-tunnel-core from shirokhorshid fork..."
+          New-Item -ItemType Directory -Path "$binDir/psiphon" -Force | Out-Null
+          git clone --depth 1 https://github.com/shirokhorshid/psiphon-tunnel-core.git psiphon-src
+          Push-Location psiphon-src/ConsoleClient
+          go build -ldflags "-s -w" -o "$binDir/psiphon/psiphon.exe" .
+          Pop-Location
+          Copy-Item "$binDir/psiphon/psiphon.exe" "$binDir/psiphon/psiphon-tunnel-core.exe"
+          Remove-Item -Recurse -Force psiphon-src
+
           # Verify core binaries exist and print versions
           if (-not (Test-Path "$binDir/xray/xray.exe")) {
             throw "xray.exe was not found or copied into bin/xray/"
@@ -211,6 +226,9 @@ jobs:
           }
           if (-not (Test-Path "$binDir/aether/aether.exe")) {
             throw "aether.exe was not found or copied into bin/aether/"
+          }
+          if (-not (Test-Path "$binDir/psiphon/psiphon.exe")) {
+            throw "psiphon.exe was not found or copied into bin/psiphon/"
           }
           if (-not (Test-Path "$binDir/sni-spoofing/sni-spoof-rs.exe")) {
             throw "sni-spoof-rs.exe was not found in bin/sni-spoofing/"
@@ -267,6 +285,11 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 'stable'
 
       - name: Resolve Version
         id: version_step
@@ -327,9 +350,9 @@ jobs:
 
       - name: Bundle Linux Core Binaries
         run: |
-          outDir="./dist/MehrON-linux-64"
+          outDir="$(pwd)/dist/MehrON-linux-64"
           binDir="$outDir/bin"
-          mkdir -p "$binDir/xray" "$binDir/sing_box" "$binDir/mihomo" "$binDir/aether"
+          mkdir -p "$binDir/xray" "$binDir/sing_box" "$binDir/mihomo" "$binDir/aether" "$binDir/psiphon"
 
           # Download latest Xray-core (Linux 64)
           echo "Downloading latest Xray-core..."
@@ -380,11 +403,22 @@ jobs:
           fi
           rm -rf aether.tar.gz aether-extracted
 
+          # Build latest psiphon-tunnel-core from shirokhorshid fork (Linux amd64)
+          echo "Building psiphon-tunnel-core from shirokhorshid fork..."
+          git clone --depth 1 https://github.com/shirokhorshid/psiphon-tunnel-core.git psiphon-src
+          cd psiphon-src/ConsoleClient
+          go build -ldflags "-s -w" -o "$binDir/psiphon/psiphon" .
+          cd ../..
+          chmod +x "$binDir/psiphon/psiphon"
+          cp -f "$binDir/psiphon/psiphon" "$binDir/psiphon/psiphon-tunnel-core"
+          rm -rf psiphon-src
+
           # Verify bundled core versions
           if [ ! -f "$binDir/xray/xray" ]; then echo "xray was not found!" >&2; exit 1; fi
           if [ ! -f "$binDir/sing_box/sing-box" ]; then echo "sing-box was not found!" >&2; exit 1; fi
           if [ ! -f "$binDir/mihomo/mihomo" ]; then echo "mihomo was not found!" >&2; exit 1; fi
           if [ ! -f "$binDir/aether/aether" ]; then echo "aether was not found!" >&2; exit 1; fi
+          if [ ! -f "$binDir/psiphon/psiphon" ]; then echo "psiphon was not found!" >&2; exit 1; fi
 
           echo "Verifying bundled core versions:"
           "$binDir/xray/xray" version
@@ -561,6 +595,7 @@ jobs:
             - **⚡ Native Architecture**: Unified and refined native runtime for Windows and Linux (Ubuntu / Debian / NixOS).
             - **🐧 Linux (Ubuntu / Debian x64) Support**: Native cross-platform desktop client release with bundled Linux cores, portable archives, and official .deb package.
             - **🌐 Aether Engine Integration**: Built-in support, dedicated 1-click server window, and distribution for the Aether censorship circumvention core (MASQUE, WireGuard, and pluggable transports).
+            - **🌀 Psiphon Integration (shirokhorshid fork)**: Built-in Psiphon core support, dedicated 1-click server window, configurable egress regions, and controllable CDN Fronting support (user-provided edge IPs/CIDRs/SNI) accessible both per-server and globally via Psiphon Settings.
             - **🧠 Memory & Performance Optimizations**: Active working-set management and dynamic heap tuning for a lightweight background footprint.
             - **🎨 UI Polish & Stability**: Refined interface components, enhanced status indicators, and general stability improvements.
             - **📦 Core Engines & Routing**: Updated high-performance core binaries and latest geo-routing rules.

@@ -15,6 +15,7 @@ public class SimpleViewLocator : IDataTemplate
     private SimpleViewLocator()
     {
         RegisterViewFactory<AddAetherServerViewModel, AddAetherServerWindow>();
+        RegisterViewFactory<AddPsiphonServerViewModel, AddPsiphonServerWindow>();
         RegisterViewFactory<AddGroupServerViewModel, AddGroupServerWindow>();
         RegisterViewFactory<AddServer2ViewModel, AddServer2Window>();
         RegisterViewFactory<AddServerViewModel, AddServerWindow>();
@@ -33,6 +34,7 @@ public class SimpleViewLocator : IDataTemplate
         RegisterViewFactory<OptionSettingViewModel, OptionSettingWindow>();
         RegisterViewFactory<ProfilesSelectViewModel, ProfilesSelectWindow>();
         RegisterViewFactory<ProfilesViewModel, ProfilesView>();
+        RegisterViewFactory<PsiphonSettingViewModel, PsiphonSettingWindow>();
         RegisterViewFactory<RoutingRuleDetailsViewModel, RoutingRuleDetailsWindow>();
         RegisterViewFactory<RoutingRuleSettingViewModel, RoutingRuleSettingWindow>();
         RegisterViewFactory<RoutingSettingViewModel, RoutingSettingWindow>();

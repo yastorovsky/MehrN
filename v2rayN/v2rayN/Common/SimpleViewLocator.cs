@@ -11,6 +11,7 @@ public class SimpleViewLocator : IViewLocator
     private SimpleViewLocator()
     {
         Register<AddAetherServerViewModel, AddAetherServerWindow>();
+        Register<AddPsiphonServerViewModel, AddPsiphonServerWindow>();
         Register<AddGroupServerViewModel, AddGroupServerWindow>();
         Register<AddServer2ViewModel, AddServer2Window>();
         Register<AddServerViewModel, AddServerWindow>();
@@ -29,6 +30,7 @@ public class SimpleViewLocator : IViewLocator
         Register<OptionSettingViewModel, OptionSettingWindow>();
         Register<ProfilesSelectViewModel, ProfilesSelectWindow>();
         Register<ProfilesViewModel, ProfilesView>();
+        Register<PsiphonSettingViewModel, PsiphonSettingWindow>();
         Register<RoutingRuleDetailsViewModel, RoutingRuleDetailsWindow>();
         Register<RoutingRuleSettingViewModel, RoutingRuleSettingWindow>();
         Register<RoutingSettingViewModel, RoutingSettingWindow>();

@@ -337,3 +337,12 @@ public class MhrItem
     // on every start.
     public string ProfileId { get; set; } = string.Empty;
 }
+
+[Serializable]
+public class PsiphonItem
+{
+    public bool CdnFrontingEnabled { get; set; } = false;
+    public string CdnFrontingEdges { get; set; } = string.Empty;
+    public string DefaultEgressRegion { get; set; } = string.Empty;
+    public int DefaultTunnelPoolSize { get; set; } = 1;
+}

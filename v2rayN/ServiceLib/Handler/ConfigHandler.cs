@@ -212,6 +212,10 @@ public static class ConfigHandler
         config.MhrItem.ProfileId ??= string.Empty;
         config.MhrItem.HttpPort = config.MhrItem.HttpPort is > 0 and <= 65535 ? config.MhrItem.HttpPort : 8085;
         config.MhrItem.Socks5Port = config.MhrItem.Socks5Port is > 0 and <= 65535 ? config.MhrItem.Socks5Port : 1080;
+        config.PsiphonItem ??= new();
+        config.PsiphonItem.CdnFrontingEdges ??= string.Empty;
+        config.PsiphonItem.DefaultEgressRegion ??= string.Empty;
+        config.PsiphonItem.DefaultTunnelPoolSize = config.PsiphonItem.DefaultTunnelPoolSize < 1 ? 1 : config.PsiphonItem.DefaultTunnelPoolSize;
         if ((config.Fragment4RayItem.Lengths ?? []).Count == 0)
         {
             config.Fragment4RayItem.Lengths = [config.Fragment4RayItem.Length ?? "50-100"];
@@ -319,6 +323,11 @@ public static class ConfigHandler
         if (item.CoreType == ECoreType.aether)
         {
             return await AddAetherServer(config, item);
+        }
+
+        if (item.CoreType == ECoreType.psiphon)
+        {
+            return await AddPsiphonServer(config, item);
         }
 
         var ret = item.ConfigType switch
@@ -653,6 +662,34 @@ public static class ConfigHandler
         {
             item.Address = Global.Loopback;
         }
+
+        await AddServerCommon(config, item, true);
+        return 0;
+    }
+
+    /// <summary>
+    /// Add or edit a Psiphon server
+    /// </summary>
+    public static async Task<int> AddPsiphonServer(Config config, ProfileItem profileItem)
+    {
+        var item = await AppManager.Instance.GetProfileItem(profileItem.IndexId);
+        if (item is null)
+        {
+            item = profileItem;
+        }
+        else
+        {
+            item.Remarks = profileItem.Remarks;
+            item.Port = profileItem.Port;
+            item.CoreType = profileItem.CoreType;
+            item.DisplayLog = profileItem.DisplayLog;
+            item.PreSocksPort = profileItem.PreSocksPort;
+            item.ProtoExtra = profileItem.ProtoExtra;
+        }
+
+        item.ConfigType = EConfigType.Custom;
+        item.CoreType = ECoreType.psiphon;
+        item.Address = Global.Loopback;
 
         await AddServerCommon(config, item, true);
         return 0;

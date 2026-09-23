@@ -34,6 +34,7 @@ public partial class MainWindowViewModel : MyReactiveObject
     public ReactiveCommand<RxVoid, RxVoid> AddAnytlsServerCmd { get; }
     public ReactiveCommand<RxVoid, RxVoid> AddNaiveServerCmd { get; }
     public ReactiveCommand<RxVoid, RxVoid> AddAetherServerCmd { get; }
+    public ReactiveCommand<RxVoid, RxVoid> AddPsiphonServerCmd { get; }
     public ReactiveCommand<RxVoid, RxVoid> AddCustomServerCmd { get; }
     public ReactiveCommand<RxVoid, RxVoid> AddCustomOutboundServerCmd { get; }
     public ReactiveCommand<RxVoid, RxVoid> AddPolicyGroupServerCmd { get; }
@@ -65,6 +66,7 @@ public partial class MainWindowViewModel : MyReactiveObject
     public ReactiveCommand<RxVoid, RxVoid> SniSpoofingSettingCmd { get; }
     public ReactiveCommand<RxVoid, RxVoid> MhrSettingCmd { get; }
     public ReactiveCommand<RxVoid, RxVoid> StopMhrCmd { get; }
+    public ReactiveCommand<RxVoid, RxVoid> PsiphonSettingCmd { get; }
 
     //Presets
     public ReactiveCommand<RxVoid, RxVoid> RegionalPresetDefaultCmd { get; }
@@ -153,6 +155,10 @@ public partial class MainWindowViewModel : MyReactiveObject
         AddAetherServerCmd = ReactiveCommand.CreateFromTask(async () =>
         {
             await AddAetherServerAsync();
+        });
+        AddPsiphonServerCmd = ReactiveCommand.CreateFromTask(async () =>
+        {
+            await AddPsiphonServerAsync();
         });
         AddCustomServerCmd = ReactiveCommand.CreateFromTask(async () =>
         {
@@ -262,6 +268,14 @@ public partial class MainWindowViewModel : MyReactiveObject
         MhrSettingCmd = ReactiveCommand.CreateFromTask(async () =>
         {
             var viewModel = new MhrSettingViewModel();
+            if (await AppManager.Instance.WindowDialog.ShowDialogAsync(viewModel) == true)
+            {
+                NoticeManager.Instance.Enqueue(ResUI.OperationSuccess);
+            }
+        });
+        PsiphonSettingCmd = ReactiveCommand.CreateFromTask(async () =>
+        {
+            var viewModel = new PsiphonSettingViewModel();
             if (await AppManager.Instance.WindowDialog.ShowDialogAsync(viewModel) == true)
             {
                 NoticeManager.Instance.Enqueue(ResUI.OperationSuccess);
@@ -563,6 +577,32 @@ public partial class MainWindowViewModel : MyReactiveObject
 
         var addAetherServerViewModel = new AddAetherServerViewModel(item);
         var ret = await AppManager.Instance.WindowDialog.ShowDialogAsync(addAetherServerViewModel);
+        if (ret == true)
+        {
+            await RefreshServersDispatcherAsync();
+            if (item.IndexId == _config.IndexId)
+            {
+                await Reload();
+            }
+        }
+    }
+
+    public async Task AddPsiphonServerAsync(ProfileItem? editItem = null)
+    {
+        var item = editItem ?? new ProfileItem
+        {
+            Subid = _config.SubIndexId,
+            ConfigType = EConfigType.Custom,
+            CoreType = ECoreType.psiphon,
+            IsSub = false,
+            PreSocksPort = 1080,
+            Address = Global.Loopback,
+            Port = 1080,
+            Remarks = "Psiphon",
+        };
+
+        var addPsiphonServerViewModel = new AddPsiphonServerViewModel(item);
+        var ret = await AppManager.Instance.WindowDialog.ShowDialogAsync(addPsiphonServerViewModel);
         if (ret == true)
         {
             await RefreshServersDispatcherAsync();
