@@ -3,6 +3,7 @@ namespace ServiceLib;
 public class Global
 {
     public const string AppName = "MehrON";
+    public const string AppEdition = "FM Edition";
     public const string GithubUrl = "https://github.com";
     public const string GithubApiUrl = "https://api.github.com/repos";
     public const string GeoUrl = "https://github.com/Chocolate4U/Iran-v2ray-rules/releases/latest/download/{0}.dat";
@@ -92,7 +93,9 @@ public class Global
     public const string XrayLocalAsset = "XRAY_LOCATION_ASSET";
     public const string XrayLocalCert = "XRAY_LOCATION_CERT";
     public const int SpeedTestPageSize = 16;
-    public const string LinuxBash = "/bin/bash";
+    public static string LinuxBash => File.Exists("/bin/bash")
+        ? "/bin/bash"
+        : (File.Exists("/usr/bin/bash") ? "/usr/bin/bash" : (File.Exists("/bin/sh") ? "/bin/sh" : "bash"));
     public const string StringTrue = "true";
     public const string StringFalse = "false";
     public const int SqliteMaxBatchSize = 10000;

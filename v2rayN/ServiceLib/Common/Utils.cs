@@ -904,8 +904,8 @@ public class Utils
         try
         {
             return blFull
-                ? $"{Global.AppName} - V{GetVersionInfo()} - {RuntimeInformation.ProcessArchitecture}"
-                : $"{Global.AppName}/{GetVersionInfo()}";
+                ? $"{Global.AppName} ({Global.AppEdition}) - V{GetVersionInfo()} - {RuntimeInformation.ProcessArchitecture}"
+                : $"{Global.AppName} ({Global.AppEdition})/{GetVersionInfo()}";
         }
         catch (Exception ex)
         {

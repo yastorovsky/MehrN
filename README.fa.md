@@ -98,6 +98,40 @@
 
 این ریلیز عمداً فاقد پروفایل، سابسکریپشن، لاگ یا فایل‌های پیکربندی ران‌تایمِ تولیدشده است.
 
+## نصب و راه‌اندازی در NixOS (نسخه‌ی FM Edition)
+
+مهرآن از سیستم‌عامل **NixOS** از طریق Nix Flakes و ماژول اختصاصی سیستم پشتیبانی می‌کند:
+
+### 🚀 اجرای سریع (بدون نیاز به نصب)
+اجرای مستقیم کلاینت:
+```bash
+nix run github:yastorovsky/MehrON/Beta#default
+```
+
+### 📦 پیکربندی سیستمی (`configuration.nix`)
+افزودن ورودی flake در فایل تنظیمات:
+```nix
+inputs = {
+  nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+  mehron.url = "github:yastorovsky/MehrON/Beta";
+};
+```
+سپس فعال‌سازی ماژول بومی:
+```nix
+{ inputs, ... }: {
+  imports = [ inputs.mehron.nixosModules.default ];
+
+  programs.mehron = {
+    enable = true;
+    tunMode = true; # فعال‌سازی دسترسی‌های شبکه برای حالت TUN
+  };
+}
+```
+یا نصب مستقیم برای کاربر:
+```bash
+nix profile install github:yastorovsky/MehrON/Beta#default
+```
+
 ## بیلد از سورس
 
 پیش‌نیازها:

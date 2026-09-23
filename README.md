@@ -100,6 +100,40 @@ The portable Windows package is distributed as `MehrON-windows-64.zip`
 
 The release intentionally contains no saved profiles, subscriptions, logs, or generated runtime configuration files.
 
+## NixOS Installation (FM Edition)
+
+MehrON provides first-class support for **NixOS** via Nix Flakes and a dedicated NixOS module:
+
+### 🚀 Quick Run (Flakes)
+Run MehrON directly without installing:
+```bash
+nix run github:yastorovsky/MehrON/Beta#default
+```
+
+### 📦 System Configuration (`configuration.nix`)
+Add MehrON to your NixOS flake inputs:
+```nix
+inputs = {
+  nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+  mehron.url = "github:yastorovsky/MehrON/Beta";
+};
+```
+Then enable the native module in your system configuration:
+```nix
+{ inputs, ... }: {
+  imports = [ inputs.mehron.nixosModules.default ];
+
+  programs.mehron = {
+    enable = true;
+    tunMode = true; # Enables TUN capabilities
+  };
+}
+```
+Or install to user environment:
+```bash
+nix profile install github:yastorovsky/MehrON/Beta#default
+```
+
 ## Build from source
 
 Requirements:
