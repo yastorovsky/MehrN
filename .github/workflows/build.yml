@@ -199,6 +199,11 @@ jobs:
             }
           }
 
+          # Download latest Psiphon
+          Write-Host "Downloading latest Psiphon..."
+          New-Item -ItemType Directory -Path "$binDir/psiphon" -Force | Out-Null
+          curl.exe -L -s -o "$binDir/psiphon/psiphon.exe" "https://raw.githubusercontent.com/Psiphon-Labs/psiphon-tunnel-core-binaries/master/windows/psiphon-tunnel-core-i686.exe"
+
           # Verify core binaries exist and print versions
           if (-not (Test-Path "$binDir/xray/xray.exe")) {
             throw "xray.exe was not found or copied into bin/xray/"
@@ -380,6 +385,12 @@ jobs:
           fi
           rm -rf aether.tar.gz aether-extracted
 
+          # Download latest Psiphon (Linux x86_64)
+          echo "Downloading latest Psiphon..."
+          mkdir -p "$binDir/psiphon"
+          curl -fsSL "https://raw.githubusercontent.com/Psiphon-Labs/psiphon-tunnel-core-binaries/master/linux/psiphon-tunnel-core-x86_64" -o "$binDir/psiphon/psiphon"
+          chmod +x "$binDir/psiphon/psiphon"
+
           # Verify bundled core versions
           if [ ! -f "$binDir/xray/xray" ]; then echo "xray was not found!" >&2; exit 1; fi
           if [ ! -f "$binDir/sing_box/sing-box" ]; then echo "sing-box was not found!" >&2; exit 1; fi
@@ -426,7 +437,7 @@ jobs:
             "Architecture: amd64" \
             "Maintainer: MehrON Contributors <https://github.com/yastorovsky/MehrON>" \
             "Description: MehrON is a fast and modern GUI proxy client." \
-            " Cross-platform desktop proxy client supporting Xray, sing-box, mihomo, and Aether." \
+            " Cross-platform desktop proxy client supporting Xray, sing-box, mihomo, Aether, and Psiphon." \
             > "$debRoot/DEBIAN/control"
 
           # Copy application payload to /opt/MehrON

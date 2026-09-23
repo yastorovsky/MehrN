@@ -106,6 +106,7 @@ public sealed class CoreInfoManager
                 lst.Add(ECoreType.mihomo);
                 lst.Add(ECoreType.sing_box);
                 lst.Add(ECoreType.aether);
+                lst.Add(ECoreType.psiphon);
             }
         }
 
@@ -142,6 +143,7 @@ public sealed class CoreInfoManager
         var urlMihomo = GetCoreUrl(ECoreType.mihomo);
         var urlSingbox = GetCoreUrl(ECoreType.sing_box);
         var urlAether = GetCoreUrl(ECoreType.aether);
+        var urlPsiphon = GetCoreUrl(ECoreType.psiphon);
 
         _coreInfo =
         [
@@ -346,6 +348,17 @@ public sealed class CoreInfoManager
                     DownloadUrlOSXArm64 = urlAether + "/download/{0}/aether-macos-arm64.tar.gz",
                     Match = "aether",
                     VersionArg = "--version",
+                },
+
+                new CoreInfo
+                {
+                    CoreType = ECoreType.psiphon,
+                    CoreExes = [ "psiphon", "psiphon-tunnel-core", "psiphon-tunnel-core-i686", "psiphon-tunnel-core-x86_64" ],
+                    Arguments = "-config {0} -formatNotices",
+                    Url = urlPsiphon,
+                    Match = "psiphon",
+                    VersionArg = "-version",
+                    AbsolutePath = true,
                 },
         ];
     }

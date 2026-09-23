@@ -481,6 +481,11 @@ public partial class ProfilesViewModel : MyReactiveObject
             var addAetherServerViewModel = new AddAetherServerViewModel(item);
             ret = await AppManager.Instance.WindowDialog.ShowDialogAsync(addAetherServerViewModel);
         }
+        else if (item.CoreType == ECoreType.psiphon)
+        {
+            var addPsiphonServerViewModel = new AddPsiphonServerViewModel(item);
+            ret = await AppManager.Instance.WindowDialog.ShowDialogAsync(addPsiphonServerViewModel);
+        }
         else if (eConfigType is EConfigType.Custom or EConfigType.Outbound)
         {
             var addServer2ViewModel = new AddServer2ViewModel(item);

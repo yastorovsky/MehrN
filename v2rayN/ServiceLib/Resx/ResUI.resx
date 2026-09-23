@@ -567,6 +567,21 @@
   <data name="menuAddAetherServer" xml:space="preserve">
     <value>Add [Aether] server</value>
   </data>
+  <data name="menuAddPsiphonServer" xml:space="preserve">
+    <value>Add [Psiphon] server</value>
+  </data>
+  <data name="titlePsiphonServer" xml:space="preserve">
+    <value>Psiphon Server</value>
+  </data>
+  <data name="TbPsiphonEgressRegion" xml:space="preserve">
+    <value>Egress Region (Country)</value>
+  </data>
+  <data name="TbPsiphonTunnelPool" xml:space="preserve">
+    <value>Tunnel Pool Size</value>
+  </data>
+  <data name="TbPsiphonLocalSocksPort" xml:space="preserve">
+    <value>Local SOCKS Port</value>
+  </data>
   <data name="menuAddCustomServer" xml:space="preserve">
     <value>Add a custom configuration</value>
   </data>

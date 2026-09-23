@@ -415,6 +415,16 @@ public class CoreManager
             environmentVars["AETHER_SOCKS"] = socksPort.ToString();
         }
 
+        if (coreInfo?.CoreType == ECoreType.psiphon)
+        {
+            var dataDir = Path.Combine(Utils.GetBinConfigPath(), "psiphon_data");
+            if (!Directory.Exists(dataDir))
+            {
+                Directory.CreateDirectory(dataDir);
+            }
+            arguments = $"{arguments} -dataRootDirectory {dataDir.AppendQuotes()}";
+        }
+
         var procService = new ProcessService(
             fileName: fileName,
             arguments: arguments,

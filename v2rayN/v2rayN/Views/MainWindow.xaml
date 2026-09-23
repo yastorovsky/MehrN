@@ -76,6 +76,10 @@
                                     Height="{StaticResource MenuItemHeight}"
                                     Header="{x:Static resx:ResUI.menuAddAetherServer}" />
                                 <MenuItem
+                                    x:Name="menuAddPsiphonServer"
+                                    Height="{StaticResource MenuItemHeight}"
+                                    Header="{x:Static resx:ResUI.menuAddPsiphonServer}" />
+                                <MenuItem
                                     x:Name="menuAddCustomServer"
                                     Height="{StaticResource MenuItemHeight}"
                                     Header="{x:Static resx:ResUI.menuAddCustomServer}" />

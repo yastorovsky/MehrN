@@ -19,6 +19,7 @@ public static class CoreConfigHandler
             {
                 ECoreType.mihomo => await new CoreConfigClashService(config, context.IsTunEnabled).GenerateClientCustomConfig(node, fileName),
                 ECoreType.aether => await GenerateClientAetherConfig(node, fileName),
+                ECoreType.psiphon => await GenerateClientPsiphonConfig(node, fileName),
                 _ => await GenerateClientCustomConfig(node, fileName)
             };
         }
@@ -124,6 +125,62 @@ public static class CoreConfigHandler
                 // Write a base identity stub so Aether initializes seamlessly
                 await File.WriteAllTextAsync(fileName, "# Aether Configuration\n");
             }
+
+            ret.Msg = string.Format(ResUI.SuccessfulConfiguration, "");
+            ret.Success = true;
+            return ret;
+        }
+        catch (Exception ex)
+        {
+            Logging.SaveLog(_tag, ex);
+            ret.Msg = ResUI.FailedGenDefaultConfiguration;
+            return ret;
+        }
+    }
+
+    private static async Task<RetResult> GenerateClientPsiphonConfig(ProfileItem node, string? fileName)
+    {
+        var ret = new RetResult();
+        try
+        {
+            if (node == null || fileName is null)
+            {
+                ret.Msg = ResUI.CheckServerSettings;
+                return ret;
+            }
+
+            if (File.Exists(fileName))
+            {
+                File.SetAttributes(fileName, FileAttributes.Normal);
+                File.Delete(fileName);
+            }
+
+            var extra = node.GetProtocolExtra();
+            var socksPort = node.PreSocksPort is > 0 and <= 65535
+                ? node.PreSocksPort.Value
+                : 20808;
+            var httpPort = Utils.GetFreePort(socksPort + 1);
+
+            var dataDir = Path.Combine(Utils.GetBinConfigPath(), "psiphon_data");
+            if (!Directory.Exists(dataDir))
+            {
+                Directory.CreateDirectory(dataDir);
+            }
+
+            var configDict = new Dictionary<string, object>
+            {
+                ["LocalSocksProxyPort"] = socksPort,
+                ["LocalHttpProxyPort"] = httpPort,
+                ["EgressRegion"] = extra?.PsiphonEgressRegion ?? string.Empty,
+                ["PropagationChannelId"] = "9438F617066C427B",
+                ["SponsorId"] = "B8B8A613EC7F4F42",
+                ["TunnelPoolSize"] = extra?.PsiphonTunnelPoolSize is > 0 and <= 10 ? extra.PsiphonTunnelPoolSize.Value : 2,
+                ["ConnectionWorkerPoolSize"] = 6,
+                ["DataStoreDirectory"] = dataDir
+            };
+
+            var json = JsonSerializer.Serialize(configDict, new JsonSerializerOptions { WriteIndented = true });
+            await File.WriteAllTextAsync(fileName, json);
 
             ret.Msg = string.Format(ResUI.SuccessfulConfiguration, "");
             ret.Success = true;

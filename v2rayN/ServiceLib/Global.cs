@@ -684,8 +684,42 @@ public class Global
         { ECoreType.shadowquic, "spongebob888/shadowquic" },
         { ECoreType.mieru, "enfein/mieru" },
         { ECoreType.aether, "CluvexStudio/Aether" },
+        { ECoreType.psiphon, "Psiphon-Labs/psiphon-tunnel-core-binaries" },
         { ECoreType.v2rayN, "yastorovsky/MehrON" },
     };
+
+    public const string PsiphonCoreName = "psiphon";
+
+    public static readonly List<string> PsiphonEgressRegions =
+    [
+        "",
+        "US",
+        "DE",
+        "GB",
+        "NL",
+        "CA",
+        "FR",
+        "CH",
+        "SG",
+        "JP",
+        "AU",
+        "AT",
+        "BE",
+        "BG",
+        "CZ",
+        "DK",
+        "ES",
+        "FI",
+        "HU",
+        "IN",
+        "IE",
+        "IT",
+        "NO",
+        "PL",
+        "RO",
+        "SE",
+        "SK"
+    ];
 
     public static readonly List<string> OtherGeoUrls =
     [
