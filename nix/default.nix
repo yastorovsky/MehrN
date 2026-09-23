@@ -65,8 +65,7 @@ stdenv.mkDerivation rec {
 
   src = fetchurl {
     url = "https://github.com/yastorovsky/MehrON/releases/download/v${version}-beta/MehrON-linux-64.tar.gz";
-    # Fallback to general release URL if tag is not yet populated
-    hash = "sha256-FIugCeiuLXk+dEt1pxPpI4pgfSKWhLe9iXI79I6YuVw=";
+    hash = "sha256-DjNY93dyIzTkdQqokJVlbv3LosANh986b45gRC1w83s=";
   };
 
   nativeBuildInputs = [
