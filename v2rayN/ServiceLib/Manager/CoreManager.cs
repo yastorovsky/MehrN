@@ -1,3 +1,5 @@
+using System.Text.Json;
+
 namespace ServiceLib.Manager;
 
 /// <summary>
@@ -293,6 +295,7 @@ public class CoreManager
             _extraProcessServices.Clear();
 
             await SniSpoofingManager.Instance.StopAsync();
+            _psiphonIsConnected = false;
         }
         catch (Exception ex)
         {
@@ -579,6 +582,7 @@ public class CoreManager
             environmentVars["AETHER_SOCKS"] = socksPort.ToString();
         }
 
+        var updateFuncToUse = _updateFunc;
         if (coreInfo.CoreType == ECoreType.psiphon)
         {
             var dirSuffix = configPath.IsNotEmpty() && Path.GetFileNameWithoutExtension(configPath) != "config"
@@ -591,6 +595,13 @@ public class CoreManager
             }
             var absConfig = Utils.GetBinConfigPath(configPath);
             arguments = $"-config {absConfig.AppendQuotes()} -dataRootDirectory {dataDir.AppendQuotes()} -formatNotices";
+
+            _psiphonIsConnected = false;
+            UpdatePsiphonStatus(ResUI.PsiphonConnecting, isConnected: false);
+            updateFuncToUse = async (notify, rawMsg) =>
+            {
+                await HandlePsiphonOutput(rawMsg, _updateFunc);
+            };
         }
 
         var procService = new ProcessService(
@@ -600,7 +611,7 @@ public class CoreManager
             displayLog: displayLog,
             redirectInput: false,
             environmentVars: environmentVars,
-            updateFunc: _updateFunc
+            updateFunc: updateFuncToUse
         );
 
         await procService.StartAsync();
@@ -626,6 +637,148 @@ public class CoreManager
                 _processJob?.AddProcess(processHandle);
             }
             catch { }
+        }
+    }
+
+    private static bool _psiphonIsConnected = false;
+
+    private static async Task HandlePsiphonOutput(string rawMsg, Func<bool, string, Task>? baseUpdateFunc)
+    {
+        if (rawMsg.IsNullOrEmpty())
+        {
+            return;
+        }
+
+        var trimmed = rawMsg.Trim();
+        if (trimmed.StartsWith('{') && trimmed.EndsWith('}'))
+        {
+            try
+            {
+                using var doc = JsonDocument.Parse(trimmed);
+                var root = doc.RootElement;
+                if (root.TryGetProperty("noticeType", out var noticeTypeProp))
+                {
+                    var noticeType = noticeTypeProp.GetString();
+                    var timeStr = DateTime.Now.ToString("HH:mm:ss");
+
+                    switch (noticeType)
+                    {
+                        case "ListeningSocksProxyPort":
+                            {
+                                var port = root.TryGetProperty("data", out var d) && d.TryGetProperty("port", out var p) ? p.ToString() : "1080";
+                                var logLine = $"[{timeStr}] [Psiphon Shirokhorshid] SOCKS proxy listening on 127.0.0.1:{port}" + Environment.NewLine;
+                                if (baseUpdateFunc != null) await baseUpdateFunc(false, logLine);
+                                return;
+                            }
+
+                        case "CandidateServers":
+                            {
+                                var count = root.TryGetProperty("data", out var d) && d.TryGetProperty("count", out var c) ? c.ToString() : "0";
+                                var logLine = $"[{timeStr}] [Psiphon Shirokhorshid] Found {count} candidate servers. Connecting..." + Environment.NewLine;
+                                UpdatePsiphonStatus(ResUI.PsiphonConnecting, isConnected: false);
+                                if (baseUpdateFunc != null) await baseUpdateFunc(false, logLine);
+                                return;
+                            }
+
+                        case "ConnectingServer":
+                            {
+                                var region = root.TryGetProperty("data", out var d) && d.TryGetProperty("egressRegion", out var r) ? r.GetString() : null;
+                                var proto = root.TryGetProperty("data", out var d2) && d2.TryGetProperty("protocol", out var p) ? p.GetString() : null;
+                                var detail = region.IsNotEmpty() ? $" ({region} / {proto})" : "";
+                                var logLine = $"[{timeStr}] [Psiphon Shirokhorshid] Connecting to server{detail}..." + Environment.NewLine;
+                                UpdatePsiphonStatus(ResUI.PsiphonConnecting, isConnected: false);
+                                if (baseUpdateFunc != null) await baseUpdateFunc(false, logLine);
+                                return;
+                            }
+
+                        case "ConnectedServer":
+                            {
+                                var region = root.TryGetProperty("data", out var d) && d.TryGetProperty("egressRegion", out var r) ? r.GetString() : null;
+                                var logLine = $"[{timeStr}] [Psiphon Shirokhorshid] Connected to server" + (region.IsNotEmpty() ? $" in {region}" : "") + ". Establishing tunnel..." + Environment.NewLine;
+                                if (baseUpdateFunc != null) await baseUpdateFunc(false, logLine);
+                                return;
+                            }
+
+                        case "ActiveTunnel":
+                            {
+                                var proto = root.TryGetProperty("data", out var d) && d.TryGetProperty("protocol", out var p) ? p.GetString() : null;
+                                var logLine = $"[{timeStr}] [Psiphon Shirokhorshid] Active tunnel established ({proto})." + Environment.NewLine;
+                                if (baseUpdateFunc != null) await baseUpdateFunc(false, logLine);
+                                return;
+                            }
+
+                        case "Tunnels":
+                            {
+                                var count = root.TryGetProperty("data", out var d) && d.TryGetProperty("count", out var c) ? c.GetInt32() : 0;
+                                if (count > 0)
+                                {
+                                    var logLine = $"[{timeStr}] [Psiphon Shirokhorshid] Connected! Active tunnels: {count}" + Environment.NewLine;
+                                    UpdatePsiphonStatus(string.Format(ResUI.PsiphonConnected, count), isConnected: true);
+                                    if (baseUpdateFunc != null) await baseUpdateFunc(false, logLine);
+                                }
+                                else
+                                {
+                                    var logLine = $"[{timeStr}] [Psiphon Shirokhorshid] Disconnected (0 active tunnels). Reconnecting..." + Environment.NewLine;
+                                    UpdatePsiphonStatus(ResUI.PsiphonDisconnected, isConnected: false);
+                                    if (baseUpdateFunc != null) await baseUpdateFunc(false, logLine);
+                                }
+                                return;
+                            }
+
+                        case "Alert":
+                            {
+                                var msg = root.TryGetProperty("data", out var d) && d.TryGetProperty("message", out var m) ? m.GetString() : null;
+                                if (msg.IsNotEmpty())
+                                {
+                                    var logLine = $"[{timeStr}] [Psiphon Shirokhorshid Alert] {msg}" + Environment.NewLine;
+                                    if (baseUpdateFunc != null) await baseUpdateFunc(false, logLine);
+                                    return;
+                                }
+                                break;
+                            }
+
+                        case "BytesTransferred":
+                            return;
+                    }
+                }
+            }
+            catch
+            {
+                // Fallback to raw output if parse fails
+            }
+        }
+
+        if (baseUpdateFunc != null)
+        {
+            await baseUpdateFunc(false, rawMsg);
+        }
+    }
+
+    private static void UpdatePsiphonStatus(string status, bool isConnected)
+    {
+        RxSchedulers.MainThreadScheduler.Schedule(() =>
+        {
+            StatusBarViewModel.Instance.RunningInfoDisplay = status;
+            var serverDisplay = StatusBarViewModel.Instance.RunningServerDisplay;
+            if (serverDisplay.IsNotEmpty() && !Utils.IsLinux())
+            {
+                StatusBarViewModel.Instance.RunningServerToolTipText = $"{serverDisplay} ({status})";
+            }
+        });
+
+        if (isConnected && !_psiphonIsConnected)
+        {
+            _psiphonIsConnected = true;
+            NoticeManager.Instance.Enqueue(status);
+            RxSchedulers.MainThreadScheduler.Schedule(async () =>
+            {
+                await Task.Delay(1500);
+                await StatusBarViewModel.Instance.TestServerAvailability();
+            });
+        }
+        else if (!isConnected)
+        {
+            _psiphonIsConnected = false;
         }
     }
 

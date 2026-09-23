@@ -5807,5 +5807,23 @@ namespace ServiceLib.Resx {
                 return ResourceManager.GetString("TbPleaseSelectProfile", resourceCulture);
             }
         }
+
+        public static string PsiphonConnecting {
+            get {
+                return ResourceManager.GetString("PsiphonConnecting", resourceCulture);
+            }
+        }
+
+        public static string PsiphonConnected {
+            get {
+                return ResourceManager.GetString("PsiphonConnected", resourceCulture);
+            }
+        }
+
+        public static string PsiphonDisconnected {
+            get {
+                return ResourceManager.GetString("PsiphonDisconnected", resourceCulture);
+            }
+        }
     }
 }

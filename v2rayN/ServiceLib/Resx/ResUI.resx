@@ -570,6 +570,15 @@
   <data name="menuAddPsiphonServer" xml:space="preserve">
     <value>Add [Psiphon Shirokhorshid] server</value>
   </data>
+  <data name="PsiphonConnecting" xml:space="preserve">
+    <value>Psiphon Shirokhorshid: Connecting...</value>
+  </data>
+  <data name="PsiphonConnected" xml:space="preserve">
+    <value>Psiphon Shirokhorshid: Connected ({0} tunnel)</value>
+  </data>
+  <data name="PsiphonDisconnected" xml:space="preserve">
+    <value>Psiphon Shirokhorshid: Disconnected (reconnecting...)</value>
+  </data>
   <data name="menuAddCustomServer" xml:space="preserve">
     <value>Add a custom configuration</value>
   </data>

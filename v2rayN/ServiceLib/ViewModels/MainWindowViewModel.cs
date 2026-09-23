@@ -855,21 +855,28 @@ public partial class MainWindowViewModel : MyReactiveObject
                 await SysProxyHandler.UpdateSysProxy(_config, false);
                 await Task.Delay(1000);
             });
-            RxSchedulers.MainThreadScheduler.Schedule(async () =>
-            {
-                var result = await StatusBarViewModel.TestServerAvailability();
-                if (result == null || profileItem.IndexId.IsNullOrEmpty())
-                {
-                    return;
-                }
+            var isPsiphon = profileItem.CoreType == ECoreType.psiphon
+                || (allResult.PreSocksResult?.Context?.Node?.CoreType == ECoreType.psiphon)
+                || (profileItem.ConfigType == EConfigType.ProxyChain && allResult.MainResult.Context.AllProxiesMap.Values.Any(p => p.CoreType == ECoreType.psiphon));
 
-                await ProfilesViewModel.SetSpeedTestResult(new()
+            if (!isPsiphon)
+            {
+                RxSchedulers.MainThreadScheduler.Schedule(async () =>
                 {
-                    IndexId = profileItem.IndexId,
-                    IpInfo = result.Ip,
-                    Delay = result.Time > 0 ? result.Time.ToString() : null
+                    var result = await StatusBarViewModel.TestServerAvailability();
+                    if (result == null || profileItem.IndexId.IsNullOrEmpty())
+                    {
+                        return;
+                    }
+
+                    await ProfilesViewModel.SetSpeedTestResult(new()
+                    {
+                        IndexId = profileItem.IndexId,
+                        IpInfo = result.Ip,
+                        Delay = result.Time > 0 ? result.Time.ToString() : null
+                    });
                 });
-            });
+            }
 
             var showClashUI = AppManager.Instance.IsRunningCore(ECoreType.sing_box);
             if (showClashUI)

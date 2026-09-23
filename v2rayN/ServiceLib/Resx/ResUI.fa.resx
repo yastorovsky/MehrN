@@ -570,6 +570,15 @@
   <data name="menuAddPsiphonServer" xml:space="preserve">
     <value>افزودن سرور [Psiphon Shirokhorshid]</value>
   </data>
+  <data name="PsiphonConnecting" xml:space="preserve">
+    <value>سایفون شیروخورشید: در حال اتصال...</value>
+  </data>
+  <data name="PsiphonConnected" xml:space="preserve">
+    <value>سایفون شیروخورشید: متصل شد ({0} تونل)</value>
+  </data>
+  <data name="PsiphonDisconnected" xml:space="preserve">
+    <value>سایفون شیروخورشید: قطع شد (در حال تلاش مجدد...)</value>
+  </data>
   <data name="menuAddCustomServer" xml:space="preserve">
     <value>یک سرور پیکربندی سفارشی اضافه شود</value>
   </data>
