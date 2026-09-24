@@ -149,7 +149,12 @@ public class CoreManager
                     // 3. Re-generate main core config with updated AllProxiesMap and start main core (Xray / Sing-box)
                     await CoreConfigHandler.GenerateClientConfig(mainContext, fileName);
                     await CoreStart(mainContext);
-                    AppManager.Instance.RunningCoreType = mainContext.RunCoreType;
+                    if (preContext != null)
+                    {
+                        await WaitForProxyPort(preContext);
+                        await CoreStartPreService(preContext);
+                    }
+                    AppManager.Instance.RunningCoreType = preContext?.RunCoreType ?? mainContext.RunCoreType;
                     if (_processService != null)
                     {
                         await UpdateFunc(true, $"{node.GetSummary()}");
@@ -167,7 +172,12 @@ public class CoreManager
                     await WaitForPort(midPort);
 
                     await CoreStart(mainContext);
-                    AppManager.Instance.RunningCoreType = mainContext.RunCoreType;
+                    if (preContext != null)
+                    {
+                        await WaitForProxyPort(preContext);
+                        await CoreStartPreService(preContext);
+                    }
+                    AppManager.Instance.RunningCoreType = preContext?.RunCoreType ?? mainContext.RunCoreType;
                     if (_processService != null)
                     {
                         await UpdateFunc(true, $"{node.GetSummary()}");
@@ -193,7 +203,12 @@ public class CoreManager
                         await WaitForPsiphonTunnel(25);
                     }
 
-                    AppManager.Instance.RunningCoreType = mainContext.RunCoreType;
+                    if (preContext != null)
+                    {
+                        await WaitForProxyPort(preContext);
+                        await CoreStartPreService(preContext);
+                    }
+                    AppManager.Instance.RunningCoreType = preContext?.RunCoreType ?? mainContext.RunCoreType;
                     if (_processService != null)
                     {
                         await UpdateFunc(true, $"{node.GetSummary()}");
@@ -327,6 +342,10 @@ public class CoreManager
             return;
         }
         _processService = proc;
+        if (node.CoreType == ECoreType.psiphon)
+        {
+            await WaitForPsiphonTunnel(25);
+        }
     }
 
     private async Task CoreStartPreService(CoreConfigContext? preContext, bool isFirst = false)

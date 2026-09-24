@@ -80,6 +80,16 @@ public partial class CoreConfigSingboxService
                         outbound = Global.DirectTag,
                         process_path = lstDirectExe,
                     });
+
+                    var lstDirectNames = lstDirectExe.Select(p => Path.GetFileName(p)).Where(n => !n.IsNullOrEmpty()).Distinct().ToList();
+                    if (lstDirectNames.Count > 0)
+                    {
+                        _coreConfig.route.rules.Add(new()
+                        {
+                            outbound = Global.DirectTag,
+                            process_name = lstDirectNames,
+                        });
+                    }
                 }
 
                 // ICMP Routing

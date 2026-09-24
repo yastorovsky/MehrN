@@ -50,7 +50,7 @@ public class CoreConfigContextBuilder
             IsWindows = Utils.IsWindows(),
             IsMacOS = Utils.IsMacOS(),
             HasGlobalIPv6Address = Utils.HasGlobalIPv6Address(),
-            ProtectCoreTypeList = config.TunModeItem.EnableTun ? [ECoreType.Xray, ECoreType.sing_box] : []
+            ProtectCoreTypeList = config.TunModeItem.EnableTun ? [ECoreType.Xray, ECoreType.sing_box, ECoreType.psiphon, ECoreType.aether, ECoreType.mihomo] : []
         };
         var validatorResult = NodeValidatorResult.Empty();
         var (actNode, nodeValidatorResult) = await ResolveNodeAsync(context, node);

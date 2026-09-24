@@ -1682,9 +1682,9 @@ public static class ConfigHandler
                 Port = AppManager.Instance.GetLocalPort(EInboundProtocol.socks)
             };
         }
-        else if (node.ConfigType == EConfigType.Custom
-            && node.PreSocksPort is > 0 and <= 65535)
+        else if (node.ConfigType == EConfigType.Custom)
         {
+            var port = node.PreSocksPort is > 0 and <= 65535 ? node.PreSocksPort.Value : (node.CoreType == ECoreType.aether ? 1819 : 1080);
             var customPreCoreType = AppManager.Instance.GetCoreType(null, EConfigType.Custom);
             var preCoreType = (enableLegacyProtect && config.TunModeItem.EnableTun) ? ECoreType.sing_box : customPreCoreType;
             itemSocks = new ProfileItem()
@@ -1692,7 +1692,7 @@ public static class ConfigHandler
                 CoreType = preCoreType,
                 ConfigType = EConfigType.SOCKS,
                 Address = Global.Loopback,
-                Port = node.PreSocksPort.Value,
+                Port = port,
             };
         }
         return itemSocks;
