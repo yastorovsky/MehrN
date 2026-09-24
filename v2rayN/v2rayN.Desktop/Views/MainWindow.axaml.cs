@@ -95,9 +95,6 @@ public partial class MainWindow : WindowBase<MainWindowViewModel>
             this.OneWayBind(ViewModel, vm => vm.BlNewUpdate, v => v.btnNewUpdate.IsVisible).DisposeWith(disposables);
 
             // top bar action buttons
-            this.BindCommand(ViewModel, vm => vm.ProfilesViewModel.FastRealPingCmd, v => v.btnTopFastRealPing).DisposeWith(disposables);
-            this.BindCommand(ViewModel, vm => vm.ProfilesViewModel.MixedTestServerCmd, v => v.btnTopMixedTest).DisposeWith(disposables);
-            this.BindCommand(ViewModel, vm => vm.ProfilesViewModel.SpeedServerCmd, v => v.btnTopSpeedTest).DisposeWith(disposables);
             this.BindCommand(ViewModel, vm => vm.ReloadCmd, v => v.btnTopReload).DisposeWith(disposables);
             this.OneWayBind(ViewModel, vm => vm.BlReloadEnabled, v => v.btnTopReload.IsEnabled).DisposeWith(disposables);
 
