@@ -35,7 +35,7 @@ public partial class MainWindow : WindowBase<MainWindowViewModel>
         {
             if (state == WindowState.Minimized)
             {
-                Task.Run(Utils.TrimMemory);
+                Task.Run(CoreManager.TrimAllProcessesMemory);
             }
         });
 
@@ -400,7 +400,7 @@ public partial class MainWindow : WindowBase<MainWindowViewModel>
                 ownedWindow.Close();
             }
             Hide();
-            Task.Run(Utils.TrimMemory);
+            Task.Run(CoreManager.TrimAllProcessesMemory);
         }
 
         AppManager.Instance.ShowInTaskbar = bl;
@@ -414,7 +414,7 @@ public partial class MainWindow : WindowBase<MainWindowViewModel>
             ShowHideWindow(false);
         }
         RestoreUI();
-        Task.Delay(3000).ContinueWith(_ => Utils.TrimMemory());
+        Task.Delay(3000).ContinueWith(_ => CoreManager.TrimAllProcessesMemory());
     }
 
     private void RestoreUI()

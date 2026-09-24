@@ -514,7 +514,11 @@ public class CoreManager
 
     private async Task<ProcessService?> RunProcessNormal(string fileName, CoreInfo? coreInfo, string configPath, bool displayLog, ProfileItem? node = null, string? upstreamProxy = null)
     {
-        var environmentVars = new Dictionary<string, string>();
+        var environmentVars = new Dictionary<string, string>
+        {
+            ["GOMEMLIMIT"] = "64MiB",
+            ["GOGC"] = "30"
+        };
         foreach (var kv in coreInfo.Environment)
         {
             environmentVars[kv.Key] = string.Format(kv.Value, coreInfo.AbsolutePath ? Utils.GetBinConfigPath(configPath).AppendQuotes() : configPath);
@@ -859,6 +863,28 @@ public class CoreManager
         {
             _psiphonIsConnected = false;
         }
+    }
+
+    public static void TrimAllProcessesMemory()
+    {
+        try
+        {
+            Utils.TrimMemory();
+
+            if (Instance._processService is { HasExited: false } proc)
+            {
+                Utils.TrimProcessMemory(proc.Handle);
+            }
+
+            foreach (var extra in Instance._extraProcessServices)
+            {
+                if (extra is { HasExited: false })
+                {
+                    Utils.TrimProcessMemory(extra.Handle);
+                }
+            }
+        }
+        catch { }
     }
 
     #endregion Process

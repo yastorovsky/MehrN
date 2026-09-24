@@ -1480,5 +1480,17 @@ public class Utils
         }
     }
 
+    public static void TrimProcessMemory(nint handle)
+    {
+        try
+        {
+            if (OperatingSystem.IsWindows() && handle != nint.Zero)
+            {
+                SetProcessWorkingSetSize(handle, -1, -1);
+            }
+        }
+        catch { }
+    }
+
     #endregion Platform
 }
