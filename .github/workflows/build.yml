@@ -597,7 +597,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: ${{ env.TAG_NAME }}
-          target_commitish: ${{ github.ref_name }}
+          target_commitish: ${{ github.sha }}
           body: |
             ## MehrON ${{ env.TAG_NAME }} (FM Edition)
 
