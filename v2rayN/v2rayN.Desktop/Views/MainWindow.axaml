@@ -9,9 +9,9 @@
     xmlns:resx="clr-namespace:ServiceLib.Resx;assembly=ServiceLib"
     xmlns:vms="clr-namespace:ServiceLib.ViewModels;assembly=ServiceLib"
     Title="MehrON"
-    Width="1200"
+    Width="1280"
     Height="800"
-    MinWidth="600"
+    MinWidth="950"
     x:DataType="vms:MainWindowViewModel"
     Design.DataContext="{x:Static dd:DesignData.MainWindow}"
     Icon="/Assets/MehrON.ico"
@@ -33,6 +33,23 @@
                         <GradientStop Offset="1.0" Color="#80708090" />
                     </LinearGradientBrush>
                     <BoxShadows x:Key="GlassBoxShadow">0 8 32 0 #26000000, inset 0 1 0 0 #FFFFFF</BoxShadows>
+                    <LinearGradientBrush x:Key="GlassButtonBg" StartPoint="0%,0%" EndPoint="0%,100%">
+                        <GradientStop Offset="0.0" Color="#66FFFFFF" />
+                        <GradientStop Offset="1.0" Color="#33FFFFFF" />
+                    </LinearGradientBrush>
+                    <LinearGradientBrush x:Key="GlassButtonBorder" StartPoint="0%,0%" EndPoint="0%,100%">
+                        <GradientStop Offset="0.0" Color="#99FFFFFF" />
+                        <GradientStop Offset="1.0" Color="#44808090" />
+                    </LinearGradientBrush>
+                    <LinearGradientBrush x:Key="GlassButtonHoverBg" StartPoint="0%,0%" EndPoint="0%,100%">
+                        <GradientStop Offset="0.0" Color="#AAFFFFFF" />
+                        <GradientStop Offset="1.0" Color="#77FFFFFF" />
+                    </LinearGradientBrush>
+                    <LinearGradientBrush x:Key="GlassButtonHoverBorder" StartPoint="0%,0%" EndPoint="0%,100%">
+                        <GradientStop Offset="0.0" Color="#DDFFFFFF" />
+                        <GradientStop Offset="1.0" Color="#88808090" />
+                    </LinearGradientBrush>
+                    <SolidColorBrush x:Key="GlassButtonPressedBg" Color="#33000000" />
                 </ResourceDictionary>
                 <ResourceDictionary x:Key="Dark">
                     <LinearGradientBrush x:Key="GlassTintBrush" StartPoint="0%,0%" EndPoint="0%,100%">
@@ -45,6 +62,23 @@
                         <GradientStop Offset="1.0" Color="#38FFFFFF" />
                     </LinearGradientBrush>
                     <BoxShadows x:Key="GlassBoxShadow">0 8 32 0 #50000000, inset 0 1 0 0 #80FFFFFF</BoxShadows>
+                    <LinearGradientBrush x:Key="GlassButtonBg" StartPoint="0%,0%" EndPoint="0%,100%">
+                        <GradientStop Offset="0.0" Color="#28FFFFFF" />
+                        <GradientStop Offset="1.0" Color="#12FFFFFF" />
+                    </LinearGradientBrush>
+                    <LinearGradientBrush x:Key="GlassButtonBorder" StartPoint="0%,0%" EndPoint="0%,100%">
+                        <GradientStop Offset="0.0" Color="#40FFFFFF" />
+                        <GradientStop Offset="1.0" Color="#1AFFFFFF" />
+                    </LinearGradientBrush>
+                    <LinearGradientBrush x:Key="GlassButtonHoverBg" StartPoint="0%,0%" EndPoint="0%,100%">
+                        <GradientStop Offset="0.0" Color="#45FFFFFF" />
+                        <GradientStop Offset="1.0" Color="#25FFFFFF" />
+                    </LinearGradientBrush>
+                    <LinearGradientBrush x:Key="GlassButtonHoverBorder" StartPoint="0%,0%" EndPoint="0%,100%">
+                        <GradientStop Offset="0.0" Color="#80FFFFFF" />
+                        <GradientStop Offset="1.0" Color="#35FFFFFF" />
+                    </LinearGradientBrush>
+                    <SolidColorBrush x:Key="GlassButtonPressedBg" Color="#30FFFFFF" />
                 </ResourceDictionary>
                 <ResourceDictionary x:Key="Default">
                     <LinearGradientBrush x:Key="GlassTintBrush" StartPoint="0%,0%" EndPoint="0%,100%">
@@ -57,141 +91,328 @@
                         <GradientStop Offset="1.0" Color="#38FFFFFF" />
                     </LinearGradientBrush>
                     <BoxShadows x:Key="GlassBoxShadow">0 8 32 0 #50000000, inset 0 1 0 0 #80FFFFFF</BoxShadows>
+                    <LinearGradientBrush x:Key="GlassButtonBg" StartPoint="0%,0%" EndPoint="0%,100%">
+                        <GradientStop Offset="0.0" Color="#28FFFFFF" />
+                        <GradientStop Offset="1.0" Color="#12FFFFFF" />
+                    </LinearGradientBrush>
+                    <LinearGradientBrush x:Key="GlassButtonBorder" StartPoint="0%,0%" EndPoint="0%,100%">
+                        <GradientStop Offset="0.0" Color="#40FFFFFF" />
+                        <GradientStop Offset="1.0" Color="#1AFFFFFF" />
+                    </LinearGradientBrush>
+                    <LinearGradientBrush x:Key="GlassButtonHoverBg" StartPoint="0%,0%" EndPoint="0%,100%">
+                        <GradientStop Offset="0.0" Color="#45FFFFFF" />
+                        <GradientStop Offset="1.0" Color="#25FFFFFF" />
+                    </LinearGradientBrush>
+                    <LinearGradientBrush x:Key="GlassButtonHoverBorder" StartPoint="0%,0%" EndPoint="0%,100%">
+                        <GradientStop Offset="0.0" Color="#80FFFFFF" />
+                        <GradientStop Offset="1.0" Color="#35FFFFFF" />
+                    </LinearGradientBrush>
+                    <SolidColorBrush x:Key="GlassButtonPressedBg" Color="#30FFFFFF" />
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
         </ResourceDictionary>
     </Window.Resources>
+
+    <Window.Styles>
+        <Style Selector="Button.GlassPill">
+            <Setter Property="Background" Value="{DynamicResource GlassButtonBg}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource GlassButtonBorder}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="14" />
+            <Setter Property="Height" Value="34" />
+            <Setter Property="Padding" Value="10,0" />
+            <Setter Property="Margin" Value="2,0" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Property="Background" Duration="0:0:0.15" />
+                    <BrushTransition Property="BorderBrush" Duration="0:0:0.15" />
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="Button.GlassPill:pointerover">
+            <Setter Property="Background" Value="{DynamicResource GlassButtonHoverBg}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource GlassButtonHoverBorder}" />
+        </Style>
+        <Style Selector="Button.GlassPill:pressed">
+            <Setter Property="Background" Value="{DynamicResource GlassButtonPressedBg}" />
+        </Style>
+
+        <Style Selector="Menu.TopGlassMenu > MenuItem">
+            <Setter Property="Background" Value="{DynamicResource GlassButtonBg}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource GlassButtonBorder}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="14" />
+            <Setter Property="Height" Value="34" />
+            <Setter Property="Padding" Value="12,0" />
+            <Setter Property="Margin" Value="2,0" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Property="Background" Duration="0:0:0.15" />
+                    <BrushTransition Property="BorderBrush" Duration="0:0:0.15" />
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="Menu.TopGlassMenu > MenuItem:pointerover">
+            <Setter Property="Background" Value="{DynamicResource GlassButtonHoverBg}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource GlassButtonHoverBorder}" />
+        </Style>
+        <Style Selector="Menu.TopGlassMenu > MenuItem:open">
+            <Setter Property="Background" Value="{DynamicResource GlassButtonHoverBg}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource GlassButtonHoverBorder}" />
+        </Style>
+    </Window.Styles>
 
     <dialogHost:DialogHost CloseOnClickAway="True" DisableOpeningAnimation="True">
         <DockPanel>
             <Border
                 x:Name="borderTopGlass"
                 DockPanel.Dock="Top"
-                Margin="12,12,12,8"
-                Padding="12,4"
+                Margin="14,14,14,10"
+                Padding="14,8"
+                MinHeight="56"
                 HorizontalAlignment="Stretch"
                 Background="{DynamicResource GlassTintBrush}"
                 BorderBrush="{DynamicResource GlassBorderBrush}"
                 BorderThickness="1"
-                CornerRadius="18"
+                CornerRadius="20"
                 BoxShadow="{DynamicResource GlassBoxShadow}">
                 <DockPanel>
-                    <ContentControl
-                        x:Name="conTheme"
+                    <!-- Right Actions Stack -->
+                    <StackPanel
                         DockPanel.Dock="Right"
-                        VerticalAlignment="Center" />
-                    <Border
-                        Width="28"
-                        Height="28"
-                        Margin="4,0,8,0"
-                        CornerRadius="8"
-                        VerticalAlignment="Center"
-                        ClipToBounds="True">
-                        <Image Source="/Assets/MehrON-logo.png" Stretch="UniformToFill" />
-                    </Border>
-                    <Menu
-                        Margin="4,0"
-                        VerticalAlignment="Center"
-                        Background="Transparent">
-                    <MenuItem Header="{x:Static resx:ResUI.menuServers}">
-                        <MenuItem
-                            x:Name="menuAddServerViaClipboard"
-                            Header="{x:Static resx:ResUI.menuAddServerViaClipboard}"
-                            InputGesture="Ctrl+V" />
-                        <MenuItem
-                            x:Name="menuAddServerViaScan"
-                            Header="{x:Static resx:ResUI.menuAddServerViaScan}"
-                            InputGesture="Ctrl+S" />
-                        <MenuItem x:Name="menuAddServerViaImage" Header="{x:Static resx:ResUI.menuAddServerViaImage}" />
-                        <Separator />
-                        <MenuItem x:Name="menuAddAetherServer" Header="{x:Static resx:ResUI.menuAddAetherServer}" />
-                        <MenuItem x:Name="menuAddPsiphonServer" Header="{x:Static resx:ResUI.menuAddPsiphonServer}" />
-                        <MenuItem x:Name="menuAddCustomServer" Header="{x:Static resx:ResUI.menuAddCustomServer}" />
-                        <MenuItem x:Name="menuAddPolicyGroupServer" Header="{x:Static resx:ResUI.menuAddPolicyGroupServer}" />
-                        <MenuItem x:Name="menuAddProxyChainServer" Header="{x:Static resx:ResUI.menuAddProxyChainServer}" />
-                        <MenuItem x:Name="menuDoubleTunnel" Header="{x:Static resx:ResUI.menuDoubleTunnel}" />
-                        <MenuItem x:Name="menuCloudflareScanner" Header="{x:Static resx:ResUI.menuCloudflareScanner}" />
-                        <MenuItem x:Name="menuAddCustomOutboundServer" Header="{x:Static resx:ResUI.menuAddCustomOutboundServer}" />
-                        <Separator />
-                        <MenuItem x:Name="menuAddVmessServer" Header="{x:Static resx:ResUI.menuAddVmessServer}" />
-                        <MenuItem x:Name="menuAddVlessServer" Header="{x:Static resx:ResUI.menuAddVlessServer}" />
-                        <MenuItem x:Name="menuAddShadowsocksServer" Header="{x:Static resx:ResUI.menuAddShadowsocksServer}" />
-                        <MenuItem x:Name="menuAddTrojanServer" Header="{x:Static resx:ResUI.menuAddTrojanServer}" />
-                        <MenuItem x:Name="menuAddHysteria2Server" Header="{x:Static resx:ResUI.menuAddHysteria2Server}" />
-                        <MenuItem x:Name="menuAddWireguardServer" Header="{x:Static resx:ResUI.menuAddWireguardServer}" />
-                        <MenuItem x:Name="menuAddSocksServer" Header="{x:Static resx:ResUI.menuAddSocksServer}" />
-                        <MenuItem x:Name="menuAddHttpServer" Header="{x:Static resx:ResUI.menuAddHttpServer}" />
-                        <Separator />
-                        <MenuItem x:Name="menuAddTuicServer" Header="{x:Static resx:ResUI.menuAddTuicServer}" />
-                        <MenuItem x:Name="menuAddAnytlsServer" Header="{x:Static resx:ResUI.menuAddAnytlsServer}" />
-                        <MenuItem x:Name="menuAddNaiveServer" Header="{x:Static resx:ResUI.menuAddNaiveServer}" />
-                    </MenuItem>
+                        Orientation="Horizontal"
+                        Spacing="6"
+                        VerticalAlignment="Center">
+                        <!-- Test Real Delay -->
+                        <Button
+                            x:Name="btnTopFastRealPing"
+                            Classes="GlassPill"
+                            ToolTip.Tip="{x:Static resx:ResUI.menuFastRealPing}">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <PathIcon
+                                    Data="{StaticResource SemiIconBolt}"
+                                    Width="13"
+                                    Height="13"
+                                    Margin="0,0,5,0"
+                                    Foreground="#10B981" />
+                                <TextBlock Text="Real Delay" VerticalAlignment="Center" FontWeight="SemiBold" />
+                            </StackPanel>
+                        </Button>
 
-                    <MenuItem Header="{x:Static resx:ResUI.menuSubscription}">
-                        <MenuItem x:Name="menuSubSetting" Header="{x:Static resx:ResUI.menuSubSetting}" />
-                        <Separator />
-                        <MenuItem x:Name="menuSubUpdate" Header="{x:Static resx:ResUI.menuSubUpdate}" />
-                        <MenuItem x:Name="menuSubUpdateViaProxy" Header="{x:Static resx:ResUI.menuSubUpdateViaProxy}" />
-                    </MenuItem>
+                        <!-- Multi Test Latency -->
+                        <Button
+                            x:Name="btnTopMixedTest"
+                            Classes="GlassPill"
+                            ToolTip.Tip="{x:Static resx:ResUI.menuMixedTestServer}">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <PathIcon
+                                    Data="{StaticResource building_ping}"
+                                    Width="13"
+                                    Height="13"
+                                    Margin="0,0,5,0"
+                                    Foreground="#3B82F6" />
+                                <TextBlock Text="Multi Test" VerticalAlignment="Center" FontWeight="SemiBold" />
+                            </StackPanel>
+                        </Button>
 
-                    <MenuItem Header="{x:Static resx:ResUI.menuSetting}">
-                        <MenuItem x:Name="menuOptionSetting" Header="{x:Static resx:ResUI.menuOptionSetting}" />
-                        <MenuItem x:Name="menuRoutingSetting" Header="{x:Static resx:ResUI.menuRoutingSetting}" />
-                        <MenuItem x:Name="menuDNSSetting" Header="{x:Static resx:ResUI.menuDNSSetting}" />
-                        <MenuItem x:Name="menuFullConfigTemplate" Header="{x:Static resx:ResUI.menuFullConfigTemplate}" />
-                        <MenuItem
-                            x:Name="menuGlobalHotkeySetting"
-                            Header="{x:Static resx:ResUI.menuGlobalHotkeySetting}"
-                            IsVisible="{Binding BlIsWindows}" />
-                        <Separator />
-                        <MenuItem
-                            x:Name="menuRebootAsAdmin"
-                            Header="{x:Static resx:ResUI.menuRebootAsAdmin}"
-                            IsVisible="{Binding BlIsWindows}" />
-                        <MenuItem
-                            x:Name="menuSettingsSetUWP"
-                            Header="{x:Static resx:ResUI.TbSettingsSetUWP}"
-                            IsVisible="{Binding BlIsWindows}" />
-                        <MenuItem x:Name="menuClearServerStatistics" Header="{x:Static resx:ResUI.menuClearServerStatistics}" />
-                        <Separator />
-                        <MenuItem Header="{x:Static resx:ResUI.menuRegionalPresets}">
-                            <MenuItem x:Name="menuRegionalPresetsDefault" Header="{x:Static resx:ResUI.menuRegionalPresetsDefault}" />
-                            <MenuItem x:Name="menuRegionalPresetsRussia" Header="{x:Static resx:ResUI.menuRegionalPresetsRussia}" />
-                            <MenuItem x:Name="menuRegionalPresetsIran" Header="{x:Static resx:ResUI.menuRegionalPresetsIran}" />
-                            <MenuItem x:Name="menuRegionalPresetsChina" Header="{x:Static resx:ResUI.menuRegionalPresetsChina}" />
-                        </MenuItem>
-                        <MenuItem x:Name="menuBackupAndRestore" Header="{x:Static resx:ResUI.menuBackupAndRestore}" />
-                        <MenuItem x:Name="menuOpenTheFileLocation" Header="{x:Static resx:ResUI.menuOpenTheFileLocation}" />
-                    </MenuItem>
+                        <!-- Speed Test -->
+                        <Button
+                            x:Name="btnTopSpeedTest"
+                            Classes="GlassPill"
+                            ToolTip.Tip="{x:Static resx:ResUI.menuSpeedServer}">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <PathIcon
+                                    Data="M12 2C6.48 2 2 6.48 2 12c0 3.69 2.47 6.86 6 8.25V18.1C5.7 16.9 4 14.65 4 12c0-4.41 3.59-8 8-8s8 3.59 8 8c0 2.65-1.7 4.9-4 6.1v2.15c3.53-1.39 6-4.56 6-8.25 0-5.52-4.48-10-10-10zm-1 5v6.2l4.2 2.5.8-1.3-3.5-2.1V7h-1.5z"
+                                    Width="13"
+                                    Height="13"
+                                    Margin="0,0,5,0"
+                                    Foreground="#F59E0B" />
+                                <TextBlock Text="Speed Test" VerticalAlignment="Center" FontWeight="SemiBold" />
+                            </StackPanel>
+                        </Button>
 
-                    <MenuItem Header="L.C Settings">
-                        <MenuItem x:Name="menuSniSpoofingSetting" Header="SNI Spoofing Settings" />
-                        <MenuItem x:Name="menuMhrSetting" Header="MHR Settings" />
-                        <MenuItem x:Name="menuPsiphonSetting" Header="Psiphon Shirokhorshid Settings" />
-                        <MenuItem x:Name="menuStopMhr" Header="Stop MHR" />
-                        <Separator />
-                        <MenuItem x:Name="menuLcCloudflareScanner" Header="{x:Static resx:ResUI.menuCloudflareScanner}" />
-                    </MenuItem>
+                        <!-- Auto Column Width Adjustment -->
+                        <Button
+                            x:Name="btnTopAutofitColumnWidth"
+                            Classes="GlassPill"
+                            ToolTip.Tip="{x:Static resx:ResUI.menuProfileAutofitColumnWidth}">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <PathIcon
+                                    Data="{StaticResource SemiIconExpand}"
+                                    Width="13"
+                                    Height="13"
+                                    Margin="0,0,5,0"
+                                    Foreground="#8B5CF6" />
+                                <TextBlock Text="Auto Width" VerticalAlignment="Center" FontWeight="SemiBold" />
+                            </StackPanel>
+                        </Button>
 
-                    <MenuItem x:Name="menuHelp" Header="{x:Static resx:ResUI.menuHelp}">
-                        <MenuItem x:Name="menuCheckUpdate" Header="{x:Static resx:ResUI.menuCheckUpdate}" />
-                        <MenuItem x:Name="menuBetaUpdates" Header="Beta Updates" />
-                        <MenuItem x:Name="menuDownloadRelease" Header="Download Latest Release (GitHub)" />
-                        <Separator />
-                    </MenuItem>
+                        <Border
+                            Width="1"
+                            Height="22"
+                            Margin="4,0"
+                            VerticalAlignment="Center"
+                            Background="{DynamicResource GlassButtonBorder}" />
 
-                    <MenuItem x:Name="menuReload" Header="{x:Static resx:ResUI.menuReload}" />
+                        <!-- Reload Button -->
+                        <Button
+                            x:Name="btnTopReload"
+                            Classes="GlassPill"
+                            Padding="8,0"
+                            ToolTip.Tip="{x:Static resx:ResUI.menuReload}">
+                            <PathIcon Data="{StaticResource building_refresh}" Width="14" Height="14" />
+                        </Button>
 
-                    <MenuItem x:Name="menuClose" Header="{x:Static resx:ResUI.menuExit}" />
-                </Menu>
+                        <!-- Theme Toggle -->
+                        <ContentControl
+                            x:Name="conTheme"
+                            VerticalAlignment="Center"
+                            Margin="2,0" />
+                    </StackPanel>
 
-                <Button
-                    x:Name="btnNewUpdate"
-                    Margin="{StaticResource MarginLr8}"
-                    HorizontalAlignment="Left"
-                    VerticalAlignment="Center"
-                    Content="{x:Static resx:ResUI.menuNewUpdate}"
-                    IsVisible="False" />
+                    <!-- Left Brand and Menu Stack -->
+                    <StackPanel
+                        Orientation="Horizontal"
+                        Spacing="4"
+                        VerticalAlignment="Center">
+                        <Border
+                            Width="30"
+                            Height="30"
+                            Margin="2,0,8,0"
+                            CornerRadius="8"
+                            VerticalAlignment="Center"
+                            ClipToBounds="True">
+                            <Image Source="/Assets/MehrON-logo.png" Stretch="UniformToFill" />
+                        </Border>
+
+                        <Menu
+                            x:Name="menuMain"
+                            Classes="TopGlassMenu"
+                            VerticalAlignment="Center"
+                            Background="Transparent">
+                            <!-- Configurations (Servers) -->
+                            <MenuItem Header="{x:Static resx:ResUI.menuServers}">
+                                <MenuItem
+                                    x:Name="menuAddServerViaClipboard"
+                                    Header="{x:Static resx:ResUI.menuAddServerViaClipboard}"
+                                    InputGesture="Ctrl+V" />
+                                <MenuItem
+                                    x:Name="menuAddServerViaScan"
+                                    Header="{x:Static resx:ResUI.menuAddServerViaScan}"
+                                    InputGesture="Ctrl+S" />
+                                <MenuItem x:Name="menuAddServerViaImage" Header="{x:Static resx:ResUI.menuAddServerViaImage}" />
+                                <Separator />
+                                <MenuItem x:Name="menuAddAetherServer" Header="{x:Static resx:ResUI.menuAddAetherServer}" />
+                                <MenuItem x:Name="menuAddPsiphonServer" Header="{x:Static resx:ResUI.menuAddPsiphonServer}" />
+                                <MenuItem x:Name="menuAddCustomServer" Header="{x:Static resx:ResUI.menuAddCustomServer}" />
+                                <MenuItem x:Name="menuAddPolicyGroupServer" Header="{x:Static resx:ResUI.menuAddPolicyGroupServer}" />
+                                <MenuItem x:Name="menuAddProxyChainServer" Header="{x:Static resx:ResUI.menuAddProxyChainServer}" />
+                                <MenuItem x:Name="menuDoubleTunnel" Header="{x:Static resx:ResUI.menuDoubleTunnel}" />
+                                <MenuItem x:Name="menuCloudflareScanner" Header="{x:Static resx:ResUI.menuCloudflareScanner}" />
+                                <MenuItem x:Name="menuAddCustomOutboundServer" Header="{x:Static resx:ResUI.menuAddCustomOutboundServer}" />
+                                <Separator />
+                                <MenuItem x:Name="menuAddVmessServer" Header="{x:Static resx:ResUI.menuAddVmessServer}" />
+                                <MenuItem x:Name="menuAddVlessServer" Header="{x:Static resx:ResUI.menuAddVlessServer}" />
+                                <MenuItem x:Name="menuAddShadowsocksServer" Header="{x:Static resx:ResUI.menuAddShadowsocksServer}" />
+                                <MenuItem x:Name="menuAddTrojanServer" Header="{x:Static resx:ResUI.menuAddTrojanServer}" />
+                                <MenuItem x:Name="menuAddHysteria2Server" Header="{x:Static resx:ResUI.menuAddHysteria2Server}" />
+                                <MenuItem x:Name="menuAddWireguardServer" Header="{x:Static resx:ResUI.menuAddWireguardServer}" />
+                                <MenuItem x:Name="menuAddSocksServer" Header="{x:Static resx:ResUI.menuAddSocksServer}" />
+                                <MenuItem x:Name="menuAddHttpServer" Header="{x:Static resx:ResUI.menuAddHttpServer}" />
+                                <Separator />
+                                <MenuItem x:Name="menuAddTuicServer" Header="{x:Static resx:ResUI.menuAddTuicServer}" />
+                                <MenuItem x:Name="menuAddAnytlsServer" Header="{x:Static resx:ResUI.menuAddAnytlsServer}" />
+                                <MenuItem x:Name="menuAddNaiveServer" Header="{x:Static resx:ResUI.menuAddNaiveServer}" />
+                            </MenuItem>
+
+                            <!-- Subscription -->
+                            <MenuItem Header="{x:Static resx:ResUI.menuSubscription}">
+                                <MenuItem x:Name="menuSubSetting" Header="{x:Static resx:ResUI.menuSubSetting}" />
+                                <Separator />
+                                <MenuItem x:Name="menuSubUpdate" Header="{x:Static resx:ResUI.menuSubUpdate}" />
+                                <MenuItem x:Name="menuSubUpdateViaProxy" Header="{x:Static resx:ResUI.menuSubUpdateViaProxy}" />
+                            </MenuItem>
+
+                            <!-- Groups -->
+                            <MenuItem Header="Groups">
+                                <MenuItem x:Name="menuGroupAdd" Header="{x:Static resx:ResUI.menuSubAdd}" />
+                                <MenuItem x:Name="menuGroupEdit" Header="{x:Static resx:ResUI.menuSubEdit}" />
+                                <MenuItem x:Name="menuGroupDelete" Header="{x:Static resx:ResUI.menuSubDelete}" />
+                                <Separator />
+                                <MenuItem x:Name="menuGroupUpdate" Header="{x:Static resx:ResUI.menuSubUpdate}" />
+                                <MenuItem x:Name="menuGroupUpdateViaProxy" Header="{x:Static resx:ResUI.menuSubUpdateViaProxy}" />
+                            </MenuItem>
+
+                            <!-- Setting -->
+                            <MenuItem Header="{x:Static resx:ResUI.menuSetting}">
+                                <MenuItem x:Name="menuOptionSetting" Header="{x:Static resx:ResUI.menuOptionSetting}" />
+                                <MenuItem x:Name="menuRoutingSetting" Header="{x:Static resx:ResUI.menuRoutingSetting}" />
+                                <MenuItem x:Name="menuDNSSetting" Header="{x:Static resx:ResUI.menuDNSSetting}" />
+                                <MenuItem x:Name="menuFullConfigTemplate" Header="{x:Static resx:ResUI.menuFullConfigTemplate}" />
+                                <MenuItem
+                                    x:Name="menuGlobalHotkeySetting"
+                                    Header="{x:Static resx:ResUI.menuGlobalHotkeySetting}"
+                                    IsVisible="{Binding BlIsWindows}" />
+                                <Separator />
+                                <MenuItem
+                                    x:Name="menuRebootAsAdmin"
+                                    Header="{x:Static resx:ResUI.menuRebootAsAdmin}"
+                                    IsVisible="{Binding BlIsWindows}" />
+                                <MenuItem
+                                    x:Name="menuSettingsSetUWP"
+                                    Header="{x:Static resx:ResUI.TbSettingsSetUWP}"
+                                    IsVisible="{Binding BlIsWindows}" />
+                                <MenuItem x:Name="menuClearServerStatistics" Header="{x:Static resx:ResUI.menuClearServerStatistics}" />
+                                <Separator />
+                                <MenuItem Header="{x:Static resx:ResUI.menuRegionalPresets}">
+                                    <MenuItem x:Name="menuRegionalPresetsDefault" Header="{x:Static resx:ResUI.menuRegionalPresetsDefault}" />
+                                    <MenuItem x:Name="menuRegionalPresetsRussia" Header="{x:Static resx:ResUI.menuRegionalPresetsRussia}" />
+                                    <MenuItem x:Name="menuRegionalPresetsIran" Header="{x:Static resx:ResUI.menuRegionalPresetsIran}" />
+                                    <MenuItem x:Name="menuRegionalPresetsChina" Header="{x:Static resx:ResUI.menuRegionalPresetsChina}" />
+                                </MenuItem>
+                                <MenuItem x:Name="menuBackupAndRestore" Header="{x:Static resx:ResUI.menuBackupAndRestore}" />
+                                <MenuItem x:Name="menuOpenTheFileLocation" Header="{x:Static resx:ResUI.menuOpenTheFileLocation}" />
+                            </MenuItem>
+
+                            <!-- L.C Settings -->
+                            <MenuItem Header="L.C Settings">
+                                <MenuItem x:Name="menuSniSpoofingSetting" Header="SNI Spoofing Settings" />
+                                <MenuItem x:Name="menuMhrSetting" Header="MHR Settings" />
+                                <MenuItem x:Name="menuPsiphonSetting" Header="Psiphon Shirokhorshid Settings" />
+                                <MenuItem x:Name="menuStopMhr" Header="Stop MHR" />
+                                <Separator />
+                                <MenuItem x:Name="menuLcCloudflareScanner" Header="{x:Static resx:ResUI.menuCloudflareScanner}" />
+                            </MenuItem>
+
+                            <!-- Help -->
+                            <MenuItem x:Name="menuHelp" Header="{x:Static resx:ResUI.menuHelp}">
+                                <MenuItem x:Name="menuCheckUpdate" Header="{x:Static resx:ResUI.menuCheckUpdate}" />
+                                <MenuItem x:Name="menuBetaUpdates" Header="Beta Updates" />
+                                <MenuItem x:Name="menuDownloadRelease" Header="Download Latest Release (GitHub)" />
+                                <Separator />
+                            </MenuItem>
+
+                            <!-- Close / Exit -->
+                            <MenuItem x:Name="menuClose" Header="{x:Static resx:ResUI.menuExit}" />
+                        </Menu>
+
+                        <Button
+                            x:Name="btnNewUpdate"
+                            Margin="{StaticResource MarginLr8}"
+                            Classes="GlassPill"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            Content="{x:Static resx:ResUI.menuNewUpdate}"
+                            IsVisible="False" />
+                    </StackPanel>
                 </DockPanel>
             </Border>
 
