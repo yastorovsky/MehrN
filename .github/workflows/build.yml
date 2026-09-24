@@ -44,7 +44,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: 'stable'
+          go-version: '1.24.x'
 
       - name: Resolve Version
         id: version_step
@@ -209,6 +209,7 @@ jobs:
           New-Item -ItemType Directory -Path "$binDir/psiphon" -Force | Out-Null
           git clone --depth 1 https://github.com/shirokhorshid/psiphon-tunnel-core.git psiphon-src
           Push-Location psiphon-src/ConsoleClient
+          $env:GOTOOLCHAIN = "local"
           go build -ldflags "-s -w" -o "$binDir/psiphon/psiphon.exe" .
           Pop-Location
           Copy-Item "$binDir/psiphon/psiphon.exe" "$binDir/psiphon/psiphon-tunnel-core.exe"
@@ -289,7 +290,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: 'stable'
+          go-version: '1.24.x'
 
       - name: Resolve Version
         id: version_step
@@ -407,7 +408,7 @@ jobs:
           echo "Building psiphon-tunnel-core from shirokhorshid fork..."
           git clone --depth 1 https://github.com/shirokhorshid/psiphon-tunnel-core.git psiphon-src
           cd psiphon-src/ConsoleClient
-          go build -ldflags "-s -w" -o "$binDir/psiphon/psiphon" .
+          GOTOOLCHAIN=local go build -ldflags "-s -w" -o "$binDir/psiphon/psiphon" .
           cd ../..
           chmod +x "$binDir/psiphon/psiphon"
           cp -f "$binDir/psiphon/psiphon" "$binDir/psiphon/psiphon-tunnel-core"
