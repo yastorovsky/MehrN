@@ -112,7 +112,6 @@ public sealed class CoreInfoManager
                 lst.Add(ECoreType.mihomo);
                 lst.Add(ECoreType.sing_box);
                 lst.Add(ECoreType.aether);
-                lst.Add(ECoreType.psiphon);
             }
         }
 
@@ -128,7 +127,6 @@ public sealed class CoreInfoManager
             ECoreType.mihomo => true,
             ECoreType.sing_box => true,
             ECoreType.aether => true,
-            ECoreType.psiphon => true,
             _ => false,
         };
     }

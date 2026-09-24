@@ -18,19 +18,81 @@
     ShowInTaskbar="True"
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Light">
+                    <LinearGradientBrush x:Key="GlassTintBrush" StartPoint="0%,0%" EndPoint="0%,100%">
+                        <GradientStop Offset="0.0" Color="#F2FFFFFF" />
+                        <GradientStop Offset="0.5" Color="#E6EDF2F9" />
+                        <GradientStop Offset="1.0" Color="#DCE0E8F2" />
+                    </LinearGradientBrush>
+                    <LinearGradientBrush x:Key="GlassBorderBrush" StartPoint="0%,0%" EndPoint="0%,100%">
+                        <GradientStop Offset="0.0" Color="#E6FFFFFF" />
+                        <GradientStop Offset="1.0" Color="#80708090" />
+                    </LinearGradientBrush>
+                    <BoxShadows x:Key="GlassBoxShadow">0 8 32 0 #26000000, inset 0 1 0 0 #FFFFFF</BoxShadows>
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Dark">
+                    <LinearGradientBrush x:Key="GlassTintBrush" StartPoint="0%,0%" EndPoint="0%,100%">
+                        <GradientStop Offset="0.0" Color="#EB262B3A" />
+                        <GradientStop Offset="0.5" Color="#E01E212D" />
+                        <GradientStop Offset="1.0" Color="#D9161822" />
+                    </LinearGradientBrush>
+                    <LinearGradientBrush x:Key="GlassBorderBrush" StartPoint="0%,0%" EndPoint="0%,100%">
+                        <GradientStop Offset="0.0" Color="#8CFFFFFF" />
+                        <GradientStop Offset="1.0" Color="#38FFFFFF" />
+                    </LinearGradientBrush>
+                    <BoxShadows x:Key="GlassBoxShadow">0 8 32 0 #50000000, inset 0 1 0 0 #80FFFFFF</BoxShadows>
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Default">
+                    <LinearGradientBrush x:Key="GlassTintBrush" StartPoint="0%,0%" EndPoint="0%,100%">
+                        <GradientStop Offset="0.0" Color="#EB262B3A" />
+                        <GradientStop Offset="0.5" Color="#E01E212D" />
+                        <GradientStop Offset="1.0" Color="#D9161822" />
+                    </LinearGradientBrush>
+                    <LinearGradientBrush x:Key="GlassBorderBrush" StartPoint="0%,0%" EndPoint="0%,100%">
+                        <GradientStop Offset="0.0" Color="#8CFFFFFF" />
+                        <GradientStop Offset="1.0" Color="#38FFFFFF" />
+                    </LinearGradientBrush>
+                    <BoxShadows x:Key="GlassBoxShadow">0 8 32 0 #50000000, inset 0 1 0 0 #80FFFFFF</BoxShadows>
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
     <dialogHost:DialogHost CloseOnClickAway="True" DisableOpeningAnimation="True">
         <DockPanel>
-            <DockPanel Margin="{StaticResource Margin8}" DockPanel.Dock="Top">
-                <ContentControl x:Name="conTheme" DockPanel.Dock="Right" />
-                <Border
-                    Width="28"
-                    Height="28"
-                    Margin="4,0,8,0"
-                    CornerRadius="6"
-                    ClipToBounds="True">
-                    <Image Source="/Assets/MehrON-logo.png" Stretch="UniformToFill" />
-                </Border>
-                <Menu Margin="8,4">
+            <Border
+                x:Name="borderTopGlass"
+                DockPanel.Dock="Top"
+                Margin="12,12,12,8"
+                Padding="12,4"
+                HorizontalAlignment="Stretch"
+                Background="{DynamicResource GlassTintBrush}"
+                BorderBrush="{DynamicResource GlassBorderBrush}"
+                BorderThickness="1"
+                CornerRadius="18"
+                BoxShadow="{DynamicResource GlassBoxShadow}">
+                <DockPanel>
+                    <ContentControl
+                        x:Name="conTheme"
+                        DockPanel.Dock="Right"
+                        VerticalAlignment="Center" />
+                    <Border
+                        Width="28"
+                        Height="28"
+                        Margin="4,0,8,0"
+                        CornerRadius="8"
+                        VerticalAlignment="Center"
+                        ClipToBounds="True">
+                        <Image Source="/Assets/MehrON-logo.png" Stretch="UniformToFill" />
+                    </Border>
+                    <Menu
+                        Margin="4,0"
+                        VerticalAlignment="Center"
+                        Background="Transparent">
                     <MenuItem Header="{x:Static resx:ResUI.menuServers}">
                         <MenuItem
                             x:Name="menuAddServerViaClipboard"
@@ -127,9 +189,11 @@
                     x:Name="btnNewUpdate"
                     Margin="{StaticResource MarginLr8}"
                     HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
                     Content="{x:Static resx:ResUI.menuNewUpdate}"
                     IsVisible="False" />
-            </DockPanel>
+                </DockPanel>
+            </Border>
 
             <Grid>
                 <Grid

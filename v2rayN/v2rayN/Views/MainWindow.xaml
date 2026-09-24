@@ -38,13 +38,29 @@
         Style="{StaticResource MaterialDesignEmbeddedDialogHost}">
         <Grid>
             <DockPanel>
-                <ToolBarTray DockPanel.Dock="Top">
-                    <ToolBar
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        ClipToBounds="True"
-                        KeyboardNavigation.TabNavigation="Continue"
-                        Style="{StaticResource MaterialDesignToolBar}">
+                <Border
+                    x:Name="borderGlassTop"
+                    DockPanel.Dock="Top"
+                    Margin="12,12,12,8"
+                    Padding="12,4"
+                    CornerRadius="18"
+                    BorderThickness="1">
+                    <Border.Effect>
+                        <DropShadowEffect
+                            BlurRadius="20"
+                            ShadowDepth="4"
+                            Direction="270"
+                            Opacity="0.2"
+                            Color="#000000" />
+                    </Border.Effect>
+                    <ToolBarTray Background="Transparent">
+                        <ToolBar
+                            Background="Transparent"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Center"
+                            ClipToBounds="True"
+                            KeyboardNavigation.TabNavigation="Continue"
+                            Style="{StaticResource MaterialDesignToolBar}">
                         <Menu Margin="0,1" Style="{StaticResource ToolbarMenu}">
                             <MenuItem Padding="{StaticResource MarginLeftRight8}" AutomationProperties.Name="{x:Static resx:ResUI.menuServers}">
                                 <MenuItem.Header>
@@ -367,6 +383,7 @@
                             Visibility="Hidden" />
                     </ToolBar>
                 </ToolBarTray>
+            </Border>
 
                 <Grid>
                     <Grid x:Name="gridMain" Visibility="Collapsed">
