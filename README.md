@@ -48,6 +48,7 @@ The portable release bundles ready-to-run runtimes — no separate core download
 | sing-box | Modern protocols including Hysteria2, TUIC, WireGuard |
 | mihomo | Clash Meta–compatible rule-based routing |
 | Aether | Censorship circumvention (MASQUE, WireGuard, pluggable transports) |
+| Psiphon Shirokhorshid | Obfuscated circumvention tunnel with custom egress regions & CDN fronting |
 | 🔥 SNI Spoofing | DPI bypass with IP/TCP-header manipulation no server needed |
 | 🛟 MHR Relay | Domain-fronted relay via Google Apps Script only a free Google account needed |
 
@@ -117,7 +118,7 @@ The output is written to `v2rayN\v2rayN\bin\Release\`.
 
 > [!NOTE]
 > Runtime binaries are not produced by the .NET build. A portable release must
-> include the required Xray, sing-box, mihomo, and Aether files beneath its
+> include the required Xray, sing-box, mihomo, Aether, and Psiphon files beneath its
 > `bin` directory before it can run standalone.
 
 ## Repository layout
@@ -143,4 +144,4 @@ Every PR and helping hand is welcome — bug reports, translations, docs, and ne
 
 ## License and acknowledgements
 
-MehrON is distributed under the GPL-3.0 license; see [LICENSE](LICENSE). It was created from the PattN / Patterniha codebase and includes or integrates with third-party projects that have their own licenses and notices, including v2rayN, Xray-core, sing-box, Aether, MHR, MHR-CFW, and the SNI spoofing component.
+MehrON is distributed under the GPL-3.0 license; see [LICENSE](LICENSE). It was created from the PattN / Patterniha codebase and includes or integrates with third-party projects that have their own licenses and notices, including v2rayN, Xray-core, sing-box, Aether, Psiphon (shirokhorshid), MHR, MHR-CFW, and the SNI spoofing component.

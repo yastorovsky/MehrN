@@ -49,6 +49,7 @@
 | sing-box | پروتکل‌های مدرن از جمله Hysteria2، TUIC، WireGuard |
 | mihomo | مسیردهی مبتنی بر قانون، سازگار با Clash Meta |
 | Aether | دور زدن فیلترینگ (MASQUE، WireGuard، پروتکل‌های pluggable transport) |
+| Psiphon Shirokhorshid | تونل ضدسانسور سایفون (فورک شیروخورشید) با انتخاب ریجن خروجی و CDN Fronting |
 | 🔥 SNI Spoofing | دور زدن DPI با دستکاری هدر IP/TCP — بدون نیاز به سرور |
 | 🛟 ریلی MHR | ریلی domain-fronted با Google Apps Script — فقط با یک اکانت رایگان گوگل |
 
@@ -152,7 +153,7 @@ dotnet build .\v2rayN\v2rayN\v2rayN.csproj -c Release
 
 > [!NOTE]
 > فایل‌های باینری ران‌تایم توسط بیلد .NET تولید نمی‌شوند. یک ریلیز پرتابل باید فایل‌های
-> لازم Xray، sing-box، mihomo و Aether را زیر پوشه‌ی `bin` خودش داشته باشد تا به‌صورت
+> لازم Xray، sing-box، mihomo، Aether و Psiphon را زیر پوشه‌ی `bin` خودش داشته باشد تا به‌صورت
 > مستقل اجرا شود.
 
 ## ساختار ریپازیتوری
@@ -177,4 +178,4 @@ _upstream_mhr_cfw/           سورس یکپارچگی MHR-CFW
 
 ## لایسنس و قدردانی
 
-MehrON تحت لایسنس GPL-3.0 توزیع می‌شود؛ به فایل [LICENSE](LICENSE) مراجعه کنید. این پروژه از کدبیس PattN / Patterniha ساخته شده و شامل یا یکپارچه با پروژه‌های شخص‌ثالثی است که لایسنس و نوتیس‌های خودشان را دارند، از جمله v2rayN، Xray-core، sing-box، Aether، MHR، MHR-CFW و کامپوننت SNI spoofing.
+MehrON تحت لایسنس GPL-3.0 توزیع می‌شود؛ به فایل [LICENSE](LICENSE) مراجعه کنید. این پروژه از کدبیس PattN / Patterniha ساخته شده و شامل یا یکپارچه با پروژه‌های شخص‌ثالثی است که لایسنس و نوتیس‌های خودشان را دارند، از جمله v2rayN، Xray-core، sing-box، Aether، Psiphon (شیروخورشید)، MHR، MHR-CFW و کامپوننت SNI spoofing.
