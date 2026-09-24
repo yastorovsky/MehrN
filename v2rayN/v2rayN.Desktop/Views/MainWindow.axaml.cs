@@ -30,7 +30,6 @@ public partial class MainWindow : WindowBase<MainWindowViewModel>
         btnNewUpdate.Click += MenuCheckUpdate_Click;
         menuBackupAndRestore.Click += MenuBackupAndRestore_Click;
         menuClose.Click += MenuClose_Click;
-        btnTopAutofitColumnWidth.Click += (s, e) => _ = ViewModel?.ProfilesViewModel?.AdjustMainLvColWidth();
 
         this.GetObservable(WindowStateProperty).Subscribe(state =>
         {
