@@ -832,11 +832,20 @@ public class CoreManager
                             if (baseUpdateFunc != null) await baseUpdateFunc(false, logLine);
                             return;
                         }
-                        return;
+                        break;
                     }
 
-                default:
-                    // Drop all other internal, diagnostic, and metadata notices (SessionId, NetworkID, Diagnostic, BytesTransferred, etc.)
+                case "BytesTransferred":
+                case "ServerTimestamp":
+                case "ActiveAuthorizationIDs":
+                case "TrafficRateLimits":
+                case "ClientUpgradeAvailable":
+                case "Homepage":
+                case "SessionId":
+                case "NetworkID":
+                case "RequestingTactics":
+                case "RequestedTactics":
+                case "ApplicationParameters":
                     return;
             }
         }

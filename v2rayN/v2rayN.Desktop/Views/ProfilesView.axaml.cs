@@ -143,7 +143,7 @@ public partial class ProfilesView : ReactiveUserControl<ProfilesViewModel>
 
             ViewModel.AdjustMainLvColWidthInteraction.RegisterHandler(interaction =>
             {
-                Dispatcher.UIThread.Post(AutofitColumnWidth, DispatcherPriority.Default);
+                //AutofitColumnWidth();
                 interaction.SetOutput(RxVoid.Default);
             }).DisposeWith(disposables);
 

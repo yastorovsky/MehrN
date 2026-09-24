@@ -190,7 +190,7 @@ public static class CoreConfigHandler
                 ["DataRootDirectory"] = dataDir,
                 ["EgressRegion"] = egressRegion,
                 ["TunnelPoolSize"] = poolSize,
-                ["EmitDiagnosticNotices"] = false,
+                ["EmitDiagnosticNotices"] = true,
                 ["EmitServerAlerts"] = true,
                 ["PropagationChannelId"] = "2C595532AC17D0E6",
                 ["SponsorId"] = "1BC527D3D09985CF",

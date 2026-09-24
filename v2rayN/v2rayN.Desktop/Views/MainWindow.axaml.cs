@@ -91,18 +91,9 @@ public partial class MainWindow : WindowBase<MainWindowViewModel>
             this.BindCommand(ViewModel, vm => vm.RegionalPresetIranCmd, v => v.menuRegionalPresetsIran).DisposeWith(disposables);
             this.BindCommand(ViewModel, vm => vm.RegionalPresetChinaCmd, v => v.menuRegionalPresetsChina).DisposeWith(disposables);
 
+            this.BindCommand(ViewModel, vm => vm.ReloadCmd, v => v.menuReload).DisposeWith(disposables);
+            this.OneWayBind(ViewModel, vm => vm.BlReloadEnabled, v => v.menuReload.IsEnabled).DisposeWith(disposables);
             this.OneWayBind(ViewModel, vm => vm.BlNewUpdate, v => v.btnNewUpdate.IsVisible).DisposeWith(disposables);
-
-            // top bar action buttons
-            this.BindCommand(ViewModel, vm => vm.ReloadCmd, v => v.btnTopReload).DisposeWith(disposables);
-            this.OneWayBind(ViewModel, vm => vm.BlReloadEnabled, v => v.btnTopReload.IsEnabled).DisposeWith(disposables);
-
-            // top bar groups menu
-            this.BindCommand(ViewModel, vm => vm.ProfilesViewModel.AddSubCmd, v => v.menuGroupAdd).DisposeWith(disposables);
-            this.BindCommand(ViewModel, vm => vm.ProfilesViewModel.EditSubCmd, v => v.menuGroupEdit).DisposeWith(disposables);
-            this.BindCommand(ViewModel, vm => vm.ProfilesViewModel.DeleteSubCmd, v => v.menuGroupDelete).DisposeWith(disposables);
-            this.BindCommand(ViewModel, vm => vm.SubUpdateCmd, v => v.menuGroupUpdate).DisposeWith(disposables);
-            this.BindCommand(ViewModel, vm => vm.SubUpdateViaProxyCmd, v => v.menuGroupUpdateViaProxy).DisposeWith(disposables);
 
             this.OneWayBind(ViewModel, vm => vm.StatusBarViewModel, v => v.contentStatusBarView.Content).DisposeWith(disposables);
 
