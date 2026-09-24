@@ -262,7 +262,7 @@ public static class CoreConfigHandler
                 return targetPath;
             }
 
-            var binPath = Path.Combine(Utils.GetBinPath(), "psiphon", "server_list.dat");
+            var binPath = Utils.GetBinPath("server_list.dat", "psiphon");
             if (File.Exists(binPath) && new FileInfo(binPath).Length > 0)
             {
                 if (!Directory.Exists(dataDir))
