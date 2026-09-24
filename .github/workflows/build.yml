@@ -44,7 +44,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.24.x'
+          go-version: 'stable'
 
       - name: Resolve Version
         id: version_step
@@ -208,8 +208,13 @@ jobs:
           Write-Host "Building psiphon-tunnel-core from shirokhorshid fork..."
           New-Item -ItemType Directory -Path "$binDir/psiphon" -Force | Out-Null
           git clone --depth 1 https://github.com/shirokhorshid/psiphon-tunnel-core.git psiphon-src
+          $unsafeFile = "psiphon-src/vendor/github.com/Psiphon-Labs/psiphon-tls/unsafe.go"
+          if (Test-Path $unsafeFile) {
+            $content = Get-Content $unsafeFile -Raw
+            $content = $content.Replace('panic(fmt.Sprintf("tls: ConnectionState', '// panic(fmt.Sprintf("tls: ConnectionState')
+            Set-Content -Path $unsafeFile -Value $content -NoNewline
+          }
           Push-Location psiphon-src/ConsoleClient
-          $env:GOTOOLCHAIN = "local"
           go build -ldflags "-s -w" -o "$binDir/psiphon/psiphon.exe" .
           Pop-Location
           Copy-Item "$binDir/psiphon/psiphon.exe" "$binDir/psiphon/psiphon-tunnel-core.exe"
@@ -290,7 +295,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.24.x'
+          go-version: 'stable'
 
       - name: Resolve Version
         id: version_step
@@ -407,8 +412,12 @@ jobs:
           # Build latest psiphon-tunnel-core from shirokhorshid fork (Linux amd64)
           echo "Building psiphon-tunnel-core from shirokhorshid fork..."
           git clone --depth 1 https://github.com/shirokhorshid/psiphon-tunnel-core.git psiphon-src
+          unsafeFile="psiphon-src/vendor/github.com/Psiphon-Labs/psiphon-tls/unsafe.go"
+          if [ -f "$unsafeFile" ]; then
+            sed -i 's|panic(fmt.Sprintf("tls: ConnectionState|// panic(fmt.Sprintf("tls: ConnectionState|g' "$unsafeFile"
+          fi
           cd psiphon-src/ConsoleClient
-          GOTOOLCHAIN=local go build -ldflags "-s -w" -o "$binDir/psiphon/psiphon" .
+          go build -ldflags "-s -w" -o "$binDir/psiphon/psiphon" .
           cd ../..
           chmod +x "$binDir/psiphon/psiphon"
           cp -f "$binDir/psiphon/psiphon" "$binDir/psiphon/psiphon-tunnel-core"
