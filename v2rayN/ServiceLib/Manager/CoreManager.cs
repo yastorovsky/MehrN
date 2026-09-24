@@ -597,6 +597,11 @@ public class CoreManager
             }
             var absConfig = Utils.GetBinConfigPath(configPath);
             arguments = $"-config {absConfig.AppendQuotes()} -dataRootDirectory {dataDir.AppendQuotes()} -formatNotices";
+            var serverListPath = CoreConfigHandler.EnsurePsiphonServerList(dataDir);
+            if (serverListPath.IsNotEmpty() && File.Exists(serverListPath))
+            {
+                arguments += $" -serverList {serverListPath.AppendQuotes()}";
+            }
 
             _psiphonIsConnected = false;
             UpdatePsiphonStatus(ResUI.PsiphonConnecting, isConnected: false);

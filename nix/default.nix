@@ -25,7 +25,7 @@
 
 let
   pname = "mehron";
-  version = "7.25.53";
+  version = "7.25.54";
 
   runtimeLibs = [
     zlib

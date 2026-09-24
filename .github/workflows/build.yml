@@ -218,6 +218,7 @@ jobs:
           go build -ldflags "-s -w" -o "$binDir/psiphon/psiphon.exe" .
           Pop-Location
           Copy-Item "$binDir/psiphon/psiphon.exe" "$binDir/psiphon/psiphon-tunnel-core.exe"
+          Copy-Item "./v2rayN/ServiceLib/Sample/psiphon_server_list" "$binDir/psiphon/server_list.dat" -Force
           Remove-Item -Recurse -Force psiphon-src
 
           # Verify core binaries exist and print versions
@@ -421,6 +422,7 @@ jobs:
           cd ../..
           chmod +x "$binDir/psiphon/psiphon"
           cp -f "$binDir/psiphon/psiphon" "$binDir/psiphon/psiphon-tunnel-core"
+          cp -f "./v2rayN/ServiceLib/Sample/psiphon_server_list" "$binDir/psiphon/server_list.dat"
           rm -rf psiphon-src
 
           # Verify bundled core versions

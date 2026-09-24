@@ -43,6 +43,7 @@ public class Global
     public const string SingboxFakeIPFilterFileName = NamespaceSample + "singbox_fakeip_filter";
     public const string ChromeRootCertFileName = NamespaceSample + "chrome_roots_pem";
     public const string MozillaRootCertFileName = NamespaceSample + "mozilla_roots_pem";
+    public const string PsiphonServerList = NamespaceSample + "psiphon_server_list";
 
     public const string ChromeRootProvider = "chrome";
     public const string MozillaRootProvider = "mozilla";

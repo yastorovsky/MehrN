@@ -181,6 +181,8 @@ public static class CoreConfigHandler
                 Directory.CreateDirectory(dataDir);
             }
 
+            EnsurePsiphonServerList(dataDir);
+
             var psiphonConfig = new Dictionary<string, object?>
             {
                 ["LocalSocksProxyPort"] = socksPort,
@@ -189,14 +191,35 @@ public static class CoreConfigHandler
                 ["EgressRegion"] = egressRegion,
                 ["TunnelPoolSize"] = poolSize,
                 ["EmitDiagnosticNotices"] = true,
-                ["PropagationChannelId"] = "FFFFFFFFFFFFFFFF",
-                ["SponsorId"] = "FFFFFFFFFFFFFFFF",
+                ["EmitServerAlerts"] = true,
+                ["PropagationChannelId"] = "2C595532AC17D0E6",
+                ["SponsorId"] = "1BC527D3D09985CF",
+                ["ClientPlatform"] = Utils.IsWindows() ? "Windows_10.0.26200_11" : "Linux",
+                ["ClientVersion"] = "158",
+                ["UseIndistinguishableTLS"] = true,
                 ["DisableLocalSocksProxy"] = false,
                 ["DisableLocalHTTPProxy"] = false,
+                ["RemoteServerListSignaturePublicKey"] = "MIICIDANBgkqhkiG9w0BAQEFAAOCAg0AMIICCAKCAgEAt7Ls+/39r+T6zNW7GiVpJfzq/xvL9SBH5rIFnk0RXYEYavax3WS6HOD35eTAqn8AniOwiH+DOkvgSKF2caqk/y1dfq47Pdymtwzp9ikpB1C5OfAysXzBiwVJlCdajBKvBZDerV1cMvRzCKvKwRmvDmHgphQQ7WfXIGbRbmmk6opMBh3roE42KcotLFtqp0RRwLtcBRNtCdsrVsjiI1Lqz/lH+T61sGjSjQ3CHMuZYSQJZo/KrvzgQXpkaCTdbObxHqb6/+i1qaVOfEsvjoiyzTxJADvSytVtcTjijhPEV6XskJVHE1Zgl+7rATr/pDQkw6DPCNBS1+Y6fy7GstZALQXwEDN/qhQI9kWkHijT8ns+i1vGg00Mk/6J75arLhqcodWsdeG/M/moWgqQAnlZAGVtJI1OgeF5fsPpXu4kctOfuZlGjVZXQNW34aOzm8r8S0eVZitPlbhcPiR4gT/aSMz/wd8lZlzZYsje/Jr8u/YtlwjjreZrGRmG8KMOzukV3lLmMppXFMvl4bxv6YFEmIuTsOhbLTwFgh7KYNjodLj/LsqRVfwz31PgWQFTEPICV7GCvgVlPRxnofqKSjgTWI4mxDhBpVcATvaoBl1L/6WLbFvBsoAUBItWwctO2xalKxF5szhGm8lccoc5MZr8kfE0uxMgsxz4er68iCID+rsCAQM=",
+                ["ServerEntrySignaturePublicKey"] = "sHuUVTWaRyh5pZwy4UguSgkwmBe0EHtJJkoF5WrxmvA=",
+                ["RemoteServerListURLs"] = new object[]
+                {
+                    new Dictionary<string, object> { ["OnlyAfterAttempts"] = 0, ["SkipVerify"] = false, ["URL"] = "aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3BzaXBob24vd2ViL2p2bmstMmN5ZC1tcDRoL3NlcnZlcl9saXN0X2NvbXByZXNzZWQ=" },
+                    new Dictionary<string, object> { ["OnlyAfterAttempts"] = 2, ["SkipVerify"] = true, ["URL"] = "aHR0cHM6Ly93d3cud2hlZWxyc3NrbWluc2lkZS5jb20vd2ViL2p2bmstMmN5ZC1tcDRoL3NlcnZlcl9saXN0X2NvbXByZXNzZWQ=" },
+                    new Dictionary<string, object> { ["OnlyAfterAttempts"] = 2, ["SkipVerify"] = true, ["URL"] = "aHR0cHM6Ly93d3cuYnJhbmRpbmd1c2FnYW1lcmVwLmNvbS93ZWIvanZuay0yY3lkLW1wNGgvc2VydmVyX2xpc3RfY29tcHJlc3NlZA==" },
+                    new Dictionary<string, object> { ["OnlyAfterAttempts"] = 2, ["SkipVerify"] = true, ["URL"] = "aHR0cHM6Ly93d3cuZ3BhbGx0aGluZ3NudW1iZXJ3ZWF0aGVyLmNvbS93ZWIvanZuay0yY3lkLW1wNGgvc2VydmVyX2xpc3RfY29tcHJlc3NlZA==" }
+                },
+                ["ObfuscatedServerListRootURLs"] = new object[]
+                {
+                    new Dictionary<string, object> { ["OnlyAfterAttempts"] = 0, ["SkipVerify"] = false, ["URL"] = "aHR0cHM6Ly9zMy5hbWF6b25hd3MuY29tL3BzaXBob24vd2ViL2p2bmstMmN5ZC1tcDRoL29zbA==" },
+                    new Dictionary<string, object> { ["OnlyAfterAttempts"] = 2, ["SkipVerify"] = true, ["URL"] = "aHR0cHM6Ly93d3cud2hlZWxyc3NrbWluc2lkZS5jb20vd2ViL2p2bmstMmN5ZC1tcDRoL29zbA==" },
+                    new Dictionary<string, object> { ["OnlyAfterAttempts"] = 2, ["SkipVerify"] = true, ["URL"] = "aHR0cHM6Ly93d3cuYnJhbmRpbmd1c2FnYW1lcmVwLmNvbS93ZWIvanZuay0yY3lkLW1wNGgvb3Ns" },
+                    new Dictionary<string, object> { ["OnlyAfterAttempts"] = 2, ["SkipVerify"] = true, ["URL"] = "aHR0cHM6Ly93d3cuZ3BhbGx0aGluZ3NudW1iZXJ3ZWF0aGVyLmNvbS93ZWIvanZuay0yY3lkLW1wNGgvb3Ns" }
+                },
             };
 
             if (upstreamProxyUrl.IsNotEmpty())
             {
+                psiphonConfig["UpstreamProxyURL"] = upstreamProxyUrl;
                 psiphonConfig["UpstreamProxyUrl"] = upstreamProxyUrl;
             }
 
@@ -226,6 +249,74 @@ public static class CoreConfigHandler
             Logging.SaveLog(_tag, ex);
             ret.Msg = ResUI.FailedGenDefaultConfiguration;
             return ret;
+        }
+    }
+
+    public static string EnsurePsiphonServerList(string dataDir)
+    {
+        try
+        {
+            var targetPath = Path.Combine(dataDir, "server_list.dat");
+            if (File.Exists(targetPath) && new FileInfo(targetPath).Length > 0)
+            {
+                return targetPath;
+            }
+
+            var binPath = Path.Combine(Utils.GetBinPath(), "psiphon", "server_list.dat");
+            if (File.Exists(binPath) && new FileInfo(binPath).Length > 0)
+            {
+                if (!Directory.Exists(dataDir))
+                {
+                    Directory.CreateDirectory(dataDir);
+                }
+                File.Copy(binPath, targetPath, true);
+                return targetPath;
+            }
+
+            var appDataPsiphon = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Psiphon3", "server_list.dat");
+            if (File.Exists(appDataPsiphon) && new FileInfo(appDataPsiphon).Length > 0)
+            {
+                if (!Directory.Exists(dataDir))
+                {
+                    Directory.CreateDirectory(dataDir);
+                }
+                File.Copy(appDataPsiphon, targetPath, true);
+                return targetPath;
+            }
+
+            var localAppDataPsiphon = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Psiphon3", "server_list.dat");
+            if (File.Exists(localAppDataPsiphon) && new FileInfo(localAppDataPsiphon).Length > 0)
+            {
+                if (!Directory.Exists(dataDir))
+                {
+                    Directory.CreateDirectory(dataDir);
+                }
+                File.Copy(localAppDataPsiphon, targetPath, true);
+                return targetPath;
+            }
+
+            var embedContent = EmbedUtils.GetEmbedText(Global.PsiphonServerList);
+            if (embedContent.IsNotEmpty())
+            {
+                if (!Directory.Exists(dataDir))
+                {
+                    Directory.CreateDirectory(dataDir);
+                }
+                File.WriteAllText(targetPath, embedContent);
+                return targetPath;
+            }
+
+            if (File.Exists(binPath))
+            {
+                return binPath;
+            }
+
+            return targetPath;
+        }
+        catch (Exception ex)
+        {
+            Logging.SaveLog(_tag, ex);
+            return string.Empty;
         }
     }
 

@@ -107,6 +107,10 @@ public partial class CoreConfigSingboxService
                 outbound.server = Global.Loopback;
                 outbound.server_port = socksPort;
                 outbound.type = "socks";
+                if (_node.CoreType == ECoreType.psiphon)
+                {
+                    outbound.network = "tcp";
+                }
                 return;
             }
 

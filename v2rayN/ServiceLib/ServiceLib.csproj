@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<OutputType>Library</OutputType>
@@ -56,6 +56,7 @@
 		<EmbeddedResource Include="Sample\tun_singbox_rules" />
 		<EmbeddedResource Include="Sample\linux_autostart_config" />
         <EmbeddedResource Include="Sample\singbox_fakeip_filter" />
+        <EmbeddedResource Include="Sample\psiphon_server_list" />
 	</ItemGroup>
 
 	<ItemGroup>
