@@ -41,6 +41,12 @@ public sealed class CoreInfoManager
                 fileName = vName;
                 break;
             }
+            var rootName = Utils.GetBinPath(Utils.GetExeName(name));
+            if (File.Exists(rootName))
+            {
+                fileName = rootName;
+                break;
+            }
         }
         if (fileName.IsNullOrEmpty())
         {
@@ -106,6 +112,7 @@ public sealed class CoreInfoManager
                 lst.Add(ECoreType.mihomo);
                 lst.Add(ECoreType.sing_box);
                 lst.Add(ECoreType.aether);
+                lst.Add(ECoreType.psiphon);
             }
         }
 
@@ -121,6 +128,7 @@ public sealed class CoreInfoManager
             ECoreType.mihomo => true,
             ECoreType.sing_box => true,
             ECoreType.aether => true,
+            ECoreType.psiphon => true,
             _ => false,
         };
     }
@@ -346,6 +354,20 @@ public sealed class CoreInfoManager
                     DownloadUrlOSXArm64 = urlAether + "/download/{0}/aether-macos-arm64.tar.gz",
                     Match = "aether",
                     VersionArg = "--version",
+                },
+
+                new CoreInfo
+                {
+                    CoreType = ECoreType.psiphon,
+                    CoreExes = [ "psiphon-tunnel-core-x86_64", "psiphon-tunnel-core-amd64", "psiphon-tunnel-core", "psiphon" ],
+                    Arguments = "-config {0} -formatNotices",
+                    Url = GetCoreUrl(ECoreType.psiphon),
+                    AbsolutePath = true,
+                    DownloadUrlWin64 = GetCoreUrl(ECoreType.psiphon) + "/download/{0}/psiphon-tunnel-core-x86_64.exe",
+                    DownloadUrlLinux64 = GetCoreUrl(ECoreType.psiphon) + "/download/{0}/psiphon-tunnel-core-x86_64",
+                    DownloadUrlLinuxArm64 = GetCoreUrl(ECoreType.psiphon) + "/download/{0}/psiphon-tunnel-core-aarch64",
+                    DownloadUrlOSX64 = GetCoreUrl(ECoreType.psiphon) + "/download/{0}/psiphon-tunnel-core-x86_64-darwin",
+                    DownloadUrlOSXArm64 = GetCoreUrl(ECoreType.psiphon) + "/download/{0}/psiphon-tunnel-core-aarch64-darwin",
                 },
         ];
     }

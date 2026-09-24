@@ -41,6 +41,11 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 'stable'
+
       - name: Resolve Version
         id: version_step
         shell: pwsh
@@ -94,7 +99,7 @@ jobs:
       - name: Bundle Core Binaries
         shell: pwsh
         run: |
-          $outDir = "./dist/MehrON-windows-64"
+          $outDir = "$((Get-Location).Path)/dist/MehrON-windows-64"
           $binDir = "$outDir/bin"
           New-Item -ItemType Directory -Path "$binDir/xray" -Force | Out-Null
           New-Item -ItemType Directory -Path "$binDir/sing_box" -Force | Out-Null
@@ -199,6 +204,23 @@ jobs:
             }
           }
 
+          # Build latest psiphon-tunnel-core from shirokhorshid fork
+          Write-Host "Building psiphon-tunnel-core from shirokhorshid fork..."
+          New-Item -ItemType Directory -Path "$binDir/psiphon" -Force | Out-Null
+          git clone --depth 1 https://github.com/shirokhorshid/psiphon-tunnel-core.git psiphon-src
+          $unsafeFile = "psiphon-src/vendor/github.com/Psiphon-Labs/psiphon-tls/unsafe.go"
+          if (Test-Path $unsafeFile) {
+            $content = Get-Content $unsafeFile -Raw
+            $content = $content.Replace('panic(fmt.Sprintf("tls: ConnectionState', '// panic(fmt.Sprintf("tls: ConnectionState')
+            Set-Content -Path $unsafeFile -Value $content -NoNewline
+          }
+          Push-Location psiphon-src/ConsoleClient
+          go build -ldflags "-s -w" -o "$binDir/psiphon/psiphon.exe" .
+          Pop-Location
+          Copy-Item "$binDir/psiphon/psiphon.exe" "$binDir/psiphon/psiphon-tunnel-core.exe"
+          Copy-Item "./v2rayN/ServiceLib/Sample/psiphon_server_list" "$binDir/psiphon/server_list.dat" -Force
+          Remove-Item -Recurse -Force psiphon-src
+
           # Verify core binaries exist and print versions
           if (-not (Test-Path "$binDir/xray/xray.exe")) {
             throw "xray.exe was not found or copied into bin/xray/"
@@ -211,6 +233,9 @@ jobs:
           }
           if (-not (Test-Path "$binDir/aether/aether.exe")) {
             throw "aether.exe was not found or copied into bin/aether/"
+          }
+          if (-not (Test-Path "$binDir/psiphon/psiphon.exe")) {
+            throw "psiphon.exe was not found or copied into bin/psiphon/"
           }
           if (-not (Test-Path "$binDir/sni-spoofing/sni-spoof-rs.exe")) {
             throw "sni-spoof-rs.exe was not found in bin/sni-spoofing/"
@@ -267,6 +292,11 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 'stable'
 
       - name: Resolve Version
         id: version_step
@@ -327,9 +357,9 @@ jobs:
 
       - name: Bundle Linux Core Binaries
         run: |
-          outDir="./dist/MehrON-linux-64"
+          outDir="$(pwd)/dist/MehrON-linux-64"
           binDir="$outDir/bin"
-          mkdir -p "$binDir/xray" "$binDir/sing_box" "$binDir/mihomo" "$binDir/aether"
+          mkdir -p "$binDir/xray" "$binDir/sing_box" "$binDir/mihomo" "$binDir/aether" "$binDir/psiphon"
 
           # Download latest Xray-core (Linux 64)
           echo "Downloading latest Xray-core..."
@@ -380,11 +410,27 @@ jobs:
           fi
           rm -rf aether.tar.gz aether-extracted
 
+          # Build latest psiphon-tunnel-core from shirokhorshid fork (Linux amd64)
+          echo "Building psiphon-tunnel-core from shirokhorshid fork..."
+          git clone --depth 1 https://github.com/shirokhorshid/psiphon-tunnel-core.git psiphon-src
+          unsafeFile="psiphon-src/vendor/github.com/Psiphon-Labs/psiphon-tls/unsafe.go"
+          if [ -f "$unsafeFile" ]; then
+            sed -i 's|panic(fmt.Sprintf("tls: ConnectionState|// panic(fmt.Sprintf("tls: ConnectionState|g' "$unsafeFile"
+          fi
+          cd psiphon-src/ConsoleClient
+          go build -ldflags "-s -w" -o "$binDir/psiphon/psiphon" .
+          cd ../..
+          chmod +x "$binDir/psiphon/psiphon"
+          cp -f "$binDir/psiphon/psiphon" "$binDir/psiphon/psiphon-tunnel-core"
+          cp -f "./v2rayN/ServiceLib/Sample/psiphon_server_list" "$binDir/psiphon/server_list.dat"
+          rm -rf psiphon-src
+
           # Verify bundled core versions
           if [ ! -f "$binDir/xray/xray" ]; then echo "xray was not found!" >&2; exit 1; fi
           if [ ! -f "$binDir/sing_box/sing-box" ]; then echo "sing-box was not found!" >&2; exit 1; fi
           if [ ! -f "$binDir/mihomo/mihomo" ]; then echo "mihomo was not found!" >&2; exit 1; fi
           if [ ! -f "$binDir/aether/aether" ]; then echo "aether was not found!" >&2; exit 1; fi
+          if [ ! -f "$binDir/psiphon/psiphon" ]; then echo "psiphon was not found!" >&2; exit 1; fi
 
           echo "Verifying bundled core versions:"
           "$binDir/xray/xray" version
@@ -541,8 +587,10 @@ jobs:
           find ./dist/MehrON-linux-64/bin -type f -exec chmod +x {} + || true
           tar -czf ./MehrON-linux-64.tar.gz -C ./dist/MehrON-linux-64 .
           (cd ./dist/MehrON-linux-64 && zip -q -r ../../MehrON-linux-64.zip .)
+          cp -f ./MehrON-linux-64.tar.gz ./MehrON-FM-Edition-nixos-64.tar.gz
           echo "Linux package: MehrON-linux-64.tar.gz ($(du -h MehrON-linux-64.tar.gz | cut -f1))"
           echo "Linux package: MehrON-linux-64.zip ($(du -h MehrON-linux-64.zip | cut -f1))"
+          echo "NixOS FM Edition package: MehrON-FM-Edition-nixos-64.tar.gz ($(du -h MehrON-FM-Edition-nixos-64.tar.gz | cut -f1))"
 
       - name: Create or Update GitHub Release
         uses: softprops/action-gh-release@v2
@@ -551,23 +599,27 @@ jobs:
           tag_name: ${{ env.TAG_NAME }}
           target_commitish: ${{ github.ref_name }}
           body: |
-            ## MehrON ${{ env.TAG_NAME }}
+            ## MehrON ${{ env.TAG_NAME }} (FM Edition)
 
             ### ✨ Improvements & Highlights
-            - **⚡ Native Architecture**: Unified and refined native runtime for Windows and Linux (Ubuntu / Debian).
+            - **🌸 FM Edition Branding**: Special edition branding across application interface, CLI versioning, and desktop entries.
+            - **❄️ First-Class NixOS Support**: Native integration via Nix Flakes, derivation, and NixOS module.
+            - **⚡ Native Architecture**: Unified and refined native runtime for Windows and Linux (Ubuntu / Debian / NixOS).
             - **🐧 Linux (Ubuntu / Debian x64) Support**: Native cross-platform desktop client release with bundled Linux cores, portable archives, and official .deb package.
             - **🌐 Aether Engine Integration**: Built-in support, dedicated 1-click server window, and distribution for the Aether censorship circumvention core (MASQUE, WireGuard, and pluggable transports).
+            - **🌀 Psiphon Integration (shirokhorshid fork)**: Built-in Psiphon core support, dedicated 1-click server window, configurable egress regions, and controllable CDN Fronting support (user-provided edge IPs/CIDRs/SNI) accessible both per-server and globally via Psiphon Settings.
             - **🧠 Memory & Performance Optimizations**: Active working-set management and dynamic heap tuning for a lightweight background footprint.
             - **🎨 UI Polish & Stability**: Refined interface components, enhanced status indicators, and general stability improvements.
             - **📦 Core Engines & Routing**: Updated high-performance core binaries and latest geo-routing rules.
 
             ---
-            *Platforms: Windows x64 (Portable), Linux x64 (Ubuntu / Debian .deb & portable)*
+            *Platforms: Windows x64 (Portable), Linux x64 (Ubuntu / Debian .deb & portable), NixOS (MehrON-FM-Edition-nixos-64.tar.gz & Flake)*
           files: |
             MehrON-windows-64.zip
             MehrON-linux-64.tar.gz
             MehrON-linux-64.zip
             MehrON-linux-amd64.deb
             MehrON-linux-64.deb
+            MehrON-FM-Edition-nixos-64.tar.gz
           draft: false
           prerelease: ${{ github.ref_name == 'Beta' }}

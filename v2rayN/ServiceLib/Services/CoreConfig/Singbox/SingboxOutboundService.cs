@@ -101,6 +101,19 @@ public partial class CoreConfigSingboxService
     {
         try
         {
+            if (_node.ConfigType == EConfigType.Custom)
+            {
+                var socksPort = _node.PreSocksPort is > 0 and <= 65535 ? _node.PreSocksPort.Value : (_node.CoreType == ECoreType.aether ? 1819 : 1080);
+                outbound.server = Global.Loopback;
+                outbound.server_port = socksPort;
+                outbound.type = "socks";
+                if (_node.CoreType == ECoreType.psiphon)
+                {
+                    outbound.network = "tcp";
+                }
+                return;
+            }
+
             var protocolExtra = _node.GetProtocolExtra();
             var transportExtra = _node.GetTransportExtra();
             var network = _node.GetNetwork();
@@ -741,7 +754,11 @@ public partial class CoreConfigSingboxService
 
             if (!dialerProxyTag.IsNullOrEmpty())
             {
-                outbound.detour = dialerProxyTag;
+                var nextNode = i != nodesReverse.Count - 1 ? nodesReverse[i + 1] : null;
+                if (node.ConfigType != EConfigType.Custom || nextNode?.ConfigType != EConfigType.Custom)
+                {
+                    outbound.detour = dialerProxyTag;
+                }
             }
 
             resultOutbounds.Add(outbound);

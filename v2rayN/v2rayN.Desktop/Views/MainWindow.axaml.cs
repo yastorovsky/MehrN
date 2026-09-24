@@ -35,7 +35,7 @@ public partial class MainWindow : WindowBase<MainWindowViewModel>
         {
             if (state == WindowState.Minimized)
             {
-                Task.Run(Utils.TrimMemory);
+                Task.Run(CoreManager.TrimAllProcessesMemory);
             }
         });
 
@@ -56,6 +56,7 @@ public partial class MainWindow : WindowBase<MainWindowViewModel>
             this.BindCommand(ViewModel, vm => vm.AddAnytlsServerCmd, v => v.menuAddAnytlsServer).DisposeWith(disposables);
             this.BindCommand(ViewModel, vm => vm.AddNaiveServerCmd, v => v.menuAddNaiveServer).DisposeWith(disposables);
             this.BindCommand(ViewModel, vm => vm.AddAetherServerCmd, v => v.menuAddAetherServer).DisposeWith(disposables);
+            this.BindCommand(ViewModel, vm => vm.AddPsiphonServerCmd, v => v.menuAddPsiphonServer).DisposeWith(disposables);
             this.BindCommand(ViewModel, vm => vm.AddCustomServerCmd, v => v.menuAddCustomServer).DisposeWith(disposables);
             this.BindCommand(ViewModel, vm => vm.AddCustomOutboundServerCmd, v => v.menuAddCustomOutboundServer).DisposeWith(disposables);
             this.BindCommand(ViewModel, vm => vm.AddPolicyGroupServerCmd, v => v.menuAddPolicyGroupServer).DisposeWith(disposables);
@@ -83,6 +84,7 @@ public partial class MainWindow : WindowBase<MainWindowViewModel>
             this.BindCommand(ViewModel, vm => vm.OpenTheFileLocationCmd, v => v.menuOpenTheFileLocation).DisposeWith(disposables);
             this.BindCommand(ViewModel, vm => vm.SniSpoofingSettingCmd, v => v.menuSniSpoofingSetting).DisposeWith(disposables);
             this.BindCommand(ViewModel, vm => vm.MhrSettingCmd, v => v.menuMhrSetting).DisposeWith(disposables);
+            this.BindCommand(ViewModel, vm => vm.PsiphonSettingCmd, v => v.menuPsiphonSetting).DisposeWith(disposables);
             this.BindCommand(ViewModel, vm => vm.StopMhrCmd, v => v.menuStopMhr).DisposeWith(disposables);
             this.BindCommand(ViewModel, vm => vm.RegionalPresetDefaultCmd, v => v.menuRegionalPresetsDefault).DisposeWith(disposables);
             this.BindCommand(ViewModel, vm => vm.RegionalPresetRussiaCmd, v => v.menuRegionalPresetsRussia).DisposeWith(disposables);
@@ -398,7 +400,7 @@ public partial class MainWindow : WindowBase<MainWindowViewModel>
                 ownedWindow.Close();
             }
             Hide();
-            Task.Run(Utils.TrimMemory);
+            Task.Run(CoreManager.TrimAllProcessesMemory);
         }
 
         AppManager.Instance.ShowInTaskbar = bl;
@@ -412,7 +414,7 @@ public partial class MainWindow : WindowBase<MainWindowViewModel>
             ShowHideWindow(false);
         }
         RestoreUI();
-        Task.Delay(3000).ContinueWith(_ => Utils.TrimMemory());
+        Task.Delay(3000).ContinueWith(_ => CoreManager.TrimAllProcessesMemory());
     }
 
     private void RestoreUI()

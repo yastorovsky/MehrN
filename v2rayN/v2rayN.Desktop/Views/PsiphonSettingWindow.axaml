@@ -1,0 +1,40 @@
+<Window
+    x:Class="v2rayN.Desktop.Views.PsiphonSettingWindow"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:resx="clr-namespace:ServiceLib.Resx;assembly=ServiceLib"
+    xmlns:vms="clr-namespace:ServiceLib.ViewModels;assembly=ServiceLib"
+    Title="Psiphon Shirokhorshid Settings"
+    Width="580"
+    Height="520"
+    x:DataType="vms:PsiphonSettingViewModel"
+    ShowInTaskbar="False"
+    WindowStartupLocation="CenterOwner">
+    <DockPanel Margin="{StaticResource Margin8}">
+        <StackPanel HorizontalAlignment="Center" DockPanel.Dock="Bottom" Orientation="Horizontal">
+            <Button x:Name="btnSave" Width="110" Content="{x:Static resx:ResUI.TbConfirm}" IsDefault="True" />
+            <Button x:Name="btnCancel" Width="110" Margin="{StaticResource MarginLr8}" Content="{x:Static resx:ResUI.TbCancel}" IsCancel="True" />
+        </StackPanel>
+        <ScrollViewer>
+            <StackPanel Spacing="12">
+                <TextBlock FontSize="18" FontWeight="SemiBold" Text="Psiphon Shirokhorshid Core Settings" />
+                <TextBlock TextWrapping="Wrap" Opacity="0.8" Text="Configure global defaults for the Psiphon tunnel core, including CDN fronting scan parameters, egress regions, and multi-tunnel pool size." />
+                
+                <CheckBox IsChecked="{Binding CdnFrontingEnabled}" Content="Enable CDN fronting (domain fronting scan via CDN)" />
+
+                <Grid ColumnDefinitions="160,*" RowDefinitions="Auto,Auto,Auto" RowSpacing="10" ColumnSpacing="12">
+                    <TextBlock Grid.Row="0" VerticalAlignment="Top" Margin="0,6,0,0" Text="CDN Edge IPs / CIDRs" />
+                    <TextBox Grid.Row="0" Grid.Column="1" Height="90" AcceptsReturn="True" TextWrapping="Wrap" Text="{Binding CdnFrontingEdges}" Watermark="User-provided edge IPs, CIDRs, or SNI (comma or newline separated)" />
+
+                    <TextBlock Grid.Row="1" VerticalAlignment="Center" Text="Default Egress Region" />
+                    <ComboBox Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" ItemsSource="{Binding EgressRegions}" SelectedItem="{Binding DefaultEgressRegion}" />
+
+                    <TextBlock Grid.Row="2" VerticalAlignment="Center" Text="Default Tunnel Pool" />
+                    <NumericUpDown Grid.Row="2" Grid.Column="1" Minimum="1" Maximum="16" Value="{Binding DefaultTunnelPoolSize}" />
+                </Grid>
+
+                <TextBlock TextWrapping="Wrap" Opacity="0.7" Text="CDN Fronting: When enabled, psiphon-tunnel-core will probe user-supplied CDN edge IP addresses and CIDRs to evade SNI/IP blocks in censored networks." />
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
+</Window>

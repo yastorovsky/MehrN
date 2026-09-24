@@ -50,7 +50,7 @@ public class CoreConfigContextBuilder
             IsWindows = Utils.IsWindows(),
             IsMacOS = Utils.IsMacOS(),
             HasGlobalIPv6Address = Utils.HasGlobalIPv6Address(),
-            ProtectCoreTypeList = config.TunModeItem.EnableTun ? [ECoreType.Xray, ECoreType.sing_box] : []
+            ProtectCoreTypeList = config.TunModeItem.EnableTun ? [ECoreType.Xray, ECoreType.sing_box, ECoreType.psiphon, ECoreType.aether, ECoreType.mihomo] : []
         };
         var validatorResult = NodeValidatorResult.Empty();
         var (actNode, nodeValidatorResult) = await ResolveNodeAsync(context, node);
@@ -192,7 +192,7 @@ public class CoreConfigContextBuilder
         var node = nodeContext.Node;
         var coreType = AppManager.Instance.GetCoreType(node, node.ConfigType);
 
-        var preSocksItem = ConfigHandler.GetPreSocksItem(config, node, coreType);
+        var preSocksItem = await ConfigHandler.GetPreSocksItem(config, node, coreType);
         if (preSocksItem != null)
         {
             var preSocksResult = await Build(nodeContext.AppConfig, preSocksItem);

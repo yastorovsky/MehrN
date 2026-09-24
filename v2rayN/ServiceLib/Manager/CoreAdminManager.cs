@@ -32,7 +32,7 @@ public class CoreAdminManager
     public async Task<ProcessService?> RunProcessAsLinuxSudo(string fileName, CoreInfo coreInfo, string configPath)
     {
         StringBuilder sb = new();
-        sb.AppendLine("#!/bin/bash");
+        sb.AppendLine("#!/usr/bin/env bash");
         var cmdLine = $"{fileName.AppendQuotes()} {string.Format(coreInfo.Arguments, Utils.GetBinConfigPath(configPath).AppendQuotes())}";
 
         // Passing environment variables to the sudo command, here it only xray or sing-box.

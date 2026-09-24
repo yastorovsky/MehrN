@@ -18,7 +18,7 @@
 <p align="center">
   Windows desktop proxy client with system proxy, TUN mode, and multi-core support
   built from the PattN / Patterniha codebase, based on v2rayN.<br />
-  ⭐ Built-in <strong>SNI spoofing</strong> + <strong>MHR relay</strong> for internet shutdowns and emergency conditions.<br />
+  ⭐ Built-in <strong>SNI spoofing</strong>, <strong>MHR relay</strong>, and <strong>Psiphon Shirokhorshid (CDN Fronting)</strong> for internet shutdowns and emergency conditions.<br />
   🪶 Lightweight client with low RAM usage.
 </p>
 
@@ -48,20 +48,22 @@ The portable release bundles ready-to-run runtimes — no separate core download
 | sing-box | Modern protocols including Hysteria2, TUIC, WireGuard |
 | mihomo | Clash Meta–compatible rule-based routing |
 | Aether | Censorship circumvention (MASQUE, WireGuard, pluggable transports) |
+| Psiphon Shirokhorshid | Obfuscated circumvention tunnel with custom egress regions & CDN fronting |
 | 🔥 SNI Spoofing | DPI bypass with IP/TCP-header manipulation no server needed |
 | 🛟 MHR Relay | Domain-fronted relay via Google Apps Script only a free Google account needed |
 
 > [!IMPORTANT]
-> **🛡️ Shutdown & emergency ready:** SNI Spoofing and MHR are built for
-> heavily filtered networks, throttling, and partial / full internet shutdowns —
+> **🛡️ Shutdown & emergency ready:** SNI Spoofing, MHR Relay, and Psiphon Shirokhorshid (with CDN Fronting) are built for
+> heavily filtered networks, severe throttling, and partial / full internet shutdowns —
 > when normal profiles and servers stop working, these modes can keep you connected.
 >
 > - **SNI Spoofing:** bypasses DPI by manipulating IP/TCP headers. No subscription or VPS required.
 > - **MHR:** routes traffic through your own Google Apps Script relay with domain fronting
 >   (`Browser -> Local proxy -> Google front -> Your Apps Script relay -> Target site`);
 >   the network filter only sees a Google-facing connection. Optional Cloudflare / VPS exit node for sites blocking Google IPs.
+> - **Psiphon Shirokhorshid (CDN Fronting):** combines multi-hop obfuscated transport with customizable CDN Fronting (clean Cloudflare edge IPs/CIDRs and custom SNIs), bypassing IP-level blocking during National Network (Intranet/Melli) restrictions.
 
-**Only in MehrON: a combination of advanced censorship circumvention tools such as [SNI Spoofing](https://github.com/patterniha/SNI-Spoofing/tree/main) and [MHR](https://github.com/masterking32/MasterHttpRelayVPN)**
+**Only in MehrON: a combination of advanced censorship circumvention tools such as [SNI Spoofing](https://github.com/patterniha/SNI-Spoofing/tree/main), [MHR](https://github.com/masterking32/MasterHttpRelayVPN), and [Psiphon Shirokhorshid](https://github.com/shirokhorshid/psiphon-tunnel-core)**
 
 
 > [!TIP]
@@ -117,7 +119,7 @@ The output is written to `v2rayN\v2rayN\bin\Release\`.
 
 > [!NOTE]
 > Runtime binaries are not produced by the .NET build. A portable release must
-> include the required Xray, sing-box, mihomo, and Aether files beneath its
+> include the required Xray, sing-box, mihomo, Aether, and Psiphon files beneath its
 > `bin` directory before it can run standalone.
 
 ## Repository layout
@@ -143,4 +145,4 @@ Every PR and helping hand is welcome — bug reports, translations, docs, and ne
 
 ## License and acknowledgements
 
-MehrON is distributed under the GPL-3.0 license; see [LICENSE](LICENSE). It was created from the PattN / Patterniha codebase and includes or integrates with third-party projects that have their own licenses and notices, including v2rayN, Xray-core, sing-box, Aether, MHR, MHR-CFW, and the SNI spoofing component.
+MehrON is distributed under the GPL-3.0 license; see [LICENSE](LICENSE). It was created from the PattN / Patterniha codebase and includes or integrates with third-party projects that have their own licenses and notices, including v2rayN, Xray-core, sing-box, Aether, Psiphon (shirokhorshid), MHR, MHR-CFW, and the SNI spoofing component.

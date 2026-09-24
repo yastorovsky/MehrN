@@ -3,6 +3,7 @@ namespace ServiceLib;
 public class Global
 {
     public const string AppName = "MehrON";
+    public const string AppEdition = "FM Edition";
     public const string GithubUrl = "https://github.com";
     public const string GithubApiUrl = "https://api.github.com/repos";
     public const string GeoUrl = "https://github.com/Chocolate4U/Iran-v2ray-rules/releases/latest/download/{0}.dat";
@@ -42,6 +43,7 @@ public class Global
     public const string SingboxFakeIPFilterFileName = NamespaceSample + "singbox_fakeip_filter";
     public const string ChromeRootCertFileName = NamespaceSample + "chrome_roots_pem";
     public const string MozillaRootCertFileName = NamespaceSample + "mozilla_roots_pem";
+    public const string PsiphonServerList = NamespaceSample + "psiphon_server_list";
 
     public const string ChromeRootProvider = "chrome";
     public const string MozillaRootProvider = "mozilla";
@@ -92,7 +94,9 @@ public class Global
     public const string XrayLocalAsset = "XRAY_LOCATION_ASSET";
     public const string XrayLocalCert = "XRAY_LOCATION_CERT";
     public const int SpeedTestPageSize = 16;
-    public const string LinuxBash = "/bin/bash";
+    public static string LinuxBash => File.Exists("/bin/bash")
+        ? "/bin/bash"
+        : (File.Exists("/usr/bin/bash") ? "/usr/bin/bash" : (File.Exists("/bin/sh") ? "/bin/sh" : "bash"));
     public const string StringTrue = "true";
     public const string StringFalse = "false";
     public const int SqliteMaxBatchSize = 10000;
@@ -684,6 +688,7 @@ public class Global
         { ECoreType.shadowquic, "spongebob888/shadowquic" },
         { ECoreType.mieru, "enfein/mieru" },
         { ECoreType.aether, "CluvexStudio/Aether" },
+        { ECoreType.psiphon, "shirokhorshid/psiphon-tunnel-core" },
         { ECoreType.v2rayN, "yastorovsky/MehrON" },
     };
 
@@ -808,5 +813,36 @@ public class Global
         "fc00::10:10:14:1/126",
         "fc00::10:1:0:1/126",
         "fc00::10:0:0:1/126",
+    ];
+
+    // Psiphon egress regions (empty string = Psiphon selects best)
+    public static readonly List<string> PsiphonEgressRegions =
+    [
+        "",
+        "US",
+        "CA",
+        "GB",
+        "DE",
+        "FR",
+        "NL",
+        "JP",
+        "SG",
+        "AU",
+        "SE",
+        "CH",
+        "NO",
+        "AT",
+        "BE",
+        "DK",
+        "FI",
+        "IE",
+        "IT",
+        "ES",
+        "PT",
+        "BR",
+        "IN",
+        "KR",
+        "TW",
+        "HK",
     ];
 }

@@ -111,13 +111,10 @@ public sealed class AppManager
 
         Task.Run(async () =>
         {
-            using var timer = new PeriodicTimer(TimeSpan.FromMinutes(10));
+            using var timer = new PeriodicTimer(TimeSpan.FromSeconds(60));
             while (await timer.WaitForNextTickAsync())
             {
-                if (!ShowInTaskbar)
-                {
-                    Utils.TrimMemory();
-                }
+                CoreManager.TrimAllProcessesMemory();
             }
         });
 

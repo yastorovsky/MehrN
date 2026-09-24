@@ -23,7 +23,7 @@
 <p align="center">
   کلاینت دسکتاپ پروکسی برای ویندوز با پروکسی سیستمی، حالت TUN و پشتیبانی از چند هسته —
   ساخته‌شده روی کدبیس PattN / Patterniha، بر پایه‌ی v2rayN.<br />
-  ⭐ همراه با <strong>SNI spoofing</strong> و <strong>ریلی MHR</strong> داخلی، برای شرایط قطعی و اضطراری اینترنت.<br />
+  ⭐ همراه با <strong>SNI spoofing</strong>، <strong>ریلی MHR</strong> و <strong>سایفون شیروخورشید (CDN Fronting)</strong>، برای شرایط قطعی و اضطراری اینترنت.<br />
   🪶 کلاینت سبک با مصرف رم پایین.
 </p>
 
@@ -49,18 +49,22 @@
 | sing-box | پروتکل‌های مدرن از جمله Hysteria2، TUIC، WireGuard |
 | mihomo | مسیردهی مبتنی بر قانون، سازگار با Clash Meta |
 | Aether | دور زدن فیلترینگ (MASQUE، WireGuard، پروتکل‌های pluggable transport) |
+| Psiphon Shirokhorshid | تونل ضدسانسور سایفون (فورک شیروخورشید) با انتخاب ریجن خروجی و CDN Fronting |
 | 🔥 SNI Spoofing | دور زدن DPI با دستکاری هدر IP/TCP — بدون نیاز به سرور |
 | 🛟 ریلی MHR | ریلی domain-fronted با Google Apps Script — فقط با یک اکانت رایگان گوگل |
 
 > [!IMPORTANT]
-> **🛡️ آماده برای قطعی و شرایط اضطراری اینترنت:** موتور SNI Spoofing و ریلی MHR برای
-> شبکه‌های به‌شدت فیلترشده، اختلال و قطعی جزئی / کامل اینترنت ساخته شده‌اند —
-> وقتی پروفایل‌ها و سرورهای عادی از کار می‌افتند، این حالت‌ها می‌توانند شما را متصل نگه دارند.
+> **🛡️ آماده برای قطعی و شرایط اضطراری اینترنت:** موتورهای SNI Spoofing، ریلی MHR و سایفون شیروخورشید (همراه با CDN Fronting) برای
+> شبکه‌های به‌شدت فیلترشده، اختلال شدید و قطعی جزئی / کامل اینترنت بین‌الملل (شبکه ملی) ساخته شده‌اند —
+> وقتی پروفایل‌ها و سرورهای عادی از کار می‌افتند، این حالت‌ها می‌توانند اتصال آزاد شما را حفظ کنند.
 >
 > - **SNI Spoofing:** با دستکاری هدرهای IP/TCP فیلترینگ DPI را دور می‌زند. بدون نیاز به سابسکریپشن یا VPS.
 > - **MHR:** ترافیک را از طریق ریلی شخصی شما روی Google Apps Script با تکنیک domain fronting عبور می‌دهد
 >   (`مرورگر -> پروکسی محلی -> مسیر Google -> ریلی Apps Script شما -> سایت مقصد`)؛
 >   فیلتر شبکه فقط یک اتصال گوگلی می‌بیند. برای سایت‌هایی که IP گوگل را بلاک می‌کنند، exit node اختیاری Cloudflare / VPS قابل اضافه شدن است.
+> - **سایفون شیروخورشید (CDN Fronting):** تلفیق پروتکل‌های چندلایه‌ی مبهم‌سازی‌شده (Obfuscated) سایفون با CDN Fronting اختصاصی (تزریق رنج IPهای تمیز کلودفلر و SNI دلخواه)، جهت دور زدن مسدودسازی‌های سطح IP و روتینگ در زمان اینترنت ملی.
+
+**فقط در MehrON: ترکیب ابزارهای پیشرفته‌ی مقابله با سانسور از جمله [SNI Spoofing](https://github.com/patterniha/SNI-Spoofing/tree/main)، [MHR](https://github.com/masterking32/MasterHttpRelayVPN) و [سایفون شیروخورشید](https://github.com/shirokhorshid/psiphon-tunnel-core)**
 
 > [!TIP]
 > ریلیزهای رسمی پرتابل به‌همراه فایل‌های باینری هسته‌ها (پوشه‌ی `bin/`) و پایگاه‌داده‌های
@@ -98,6 +102,43 @@
 
 این ریلیز عمداً فاقد پروفایل، سابسکریپشن، لاگ یا فایل‌های پیکربندی ران‌تایمِ تولیدشده است.
 
+## نصب و راه‌اندازی در NixOS (نسخه‌ی FM Edition)
+
+مهرآن از سیستم‌عامل **NixOS** از طریق Nix Flakes و ماژول اختصاصی سیستم پشتیبانی می‌کند:
+
+### 🚀 اجرای سریع (بدون نیاز به نصب)
+اجرای مستقیم کلاینت:
+```bash
+nix run github:yastorovsky/MehrON/Beta#default
+```
+
+### 📦 پیکربندی سیستمی (`configuration.nix`)
+افزودن ورودی flake در فایل تنظیمات:
+```nix
+inputs = {
+  nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+  mehron.url = "github:yastorovsky/MehrON/Beta";
+};
+```
+سپس فعال‌سازی ماژول بومی:
+```nix
+{ inputs, ... }: {
+  imports = [ inputs.mehron.nixosModules.default ];
+
+  programs.mehron = {
+    enable = true;
+    tunMode = true; # فعال‌سازی دسترسی‌های شبکه برای حالت TUN
+  };
+}
+```
+یا نصب مستقیم برای کاربر:
+```bash
+nix profile install github:yastorovsky/MehrON/Beta#default
+```
+
+### 📥 دانلود مستقیم فایل ریلیز
+می‌توانید آرشیو اختصاصی **`MehrON-FM-Edition-nixos-64.tar.gz`** را مستقیماً از بخش [ریلیزهای گیت‌هاب](https://github.com/yastorovsky/MehrON/releases) دریافت و استفاده نمایید.
+
 ## بیلد از سورس
 
 پیش‌نیازها:
@@ -115,7 +156,7 @@ dotnet build .\v2rayN\v2rayN\v2rayN.csproj -c Release
 
 > [!NOTE]
 > فایل‌های باینری ران‌تایم توسط بیلد .NET تولید نمی‌شوند. یک ریلیز پرتابل باید فایل‌های
-> لازم Xray، sing-box، mihomo و Aether را زیر پوشه‌ی `bin` خودش داشته باشد تا به‌صورت
+> لازم Xray، sing-box، mihomo، Aether و Psiphon را زیر پوشه‌ی `bin` خودش داشته باشد تا به‌صورت
 > مستقل اجرا شود.
 
 ## ساختار ریپازیتوری
@@ -140,4 +181,4 @@ _upstream_mhr_cfw/           سورس یکپارچگی MHR-CFW
 
 ## لایسنس و قدردانی
 
-MehrON تحت لایسنس GPL-3.0 توزیع می‌شود؛ به فایل [LICENSE](LICENSE) مراجعه کنید. این پروژه از کدبیس PattN / Patterniha ساخته شده و شامل یا یکپارچه با پروژه‌های شخص‌ثالثی است که لایسنس و نوتیس‌های خودشان را دارند، از جمله v2rayN، Xray-core، sing-box، Aether، MHR، MHR-CFW و کامپوننت SNI spoofing.
+MehrON تحت لایسنس GPL-3.0 توزیع می‌شود؛ به فایل [LICENSE](LICENSE) مراجعه کنید. این پروژه از کدبیس PattN / Patterniha ساخته شده و شامل یا یکپارچه با پروژه‌های شخص‌ثالثی است که لایسنس و نوتیس‌های خودشان را دارند، از جمله v2rayN، Xray-core، sing-box، Aether، Psiphon (شیروخورشید)، MHR، MHR-CFW و کامپوننت SNI spoofing.

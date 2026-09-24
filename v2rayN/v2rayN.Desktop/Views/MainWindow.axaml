@@ -43,6 +43,7 @@
                         <MenuItem x:Name="menuAddServerViaImage" Header="{x:Static resx:ResUI.menuAddServerViaImage}" />
                         <Separator />
                         <MenuItem x:Name="menuAddAetherServer" Header="{x:Static resx:ResUI.menuAddAetherServer}" />
+                        <MenuItem x:Name="menuAddPsiphonServer" Header="{x:Static resx:ResUI.menuAddPsiphonServer}" />
                         <MenuItem x:Name="menuAddCustomServer" Header="{x:Static resx:ResUI.menuAddCustomServer}" />
                         <MenuItem x:Name="menuAddPolicyGroupServer" Header="{x:Static resx:ResUI.menuAddPolicyGroupServer}" />
                         <MenuItem x:Name="menuAddProxyChainServer" Header="{x:Static resx:ResUI.menuAddProxyChainServer}" />
@@ -104,6 +105,7 @@
                     <MenuItem Header="L.C Settings">
                         <MenuItem x:Name="menuSniSpoofingSetting" Header="SNI Spoofing Settings" />
                         <MenuItem x:Name="menuMhrSetting" Header="MHR Settings" />
+                        <MenuItem x:Name="menuPsiphonSetting" Header="Psiphon Shirokhorshid Settings" />
                         <MenuItem x:Name="menuStopMhr" Header="Stop MHR" />
                         <Separator />
                         <MenuItem x:Name="menuLcCloudflareScanner" Header="{x:Static resx:ResUI.menuCloudflareScanner}" />

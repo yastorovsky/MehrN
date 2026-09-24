@@ -790,6 +790,15 @@ namespace ServiceLib.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add [Psiphon] server.
+        /// </summary>
+        public static string menuAddPsiphonServer {
+            get {
+                return ResourceManager.GetString("menuAddPsiphonServer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Add a custom configuration 的本地化字符串。
         /// </summary>
         public static string menuAddCustomServer {
@@ -5796,6 +5805,24 @@ namespace ServiceLib.Resx {
         public static string TbPleaseSelectProfile {
             get {
                 return ResourceManager.GetString("TbPleaseSelectProfile", resourceCulture);
+            }
+        }
+
+        public static string PsiphonConnecting {
+            get {
+                return ResourceManager.GetString("PsiphonConnecting", resourceCulture);
+            }
+        }
+
+        public static string PsiphonConnected {
+            get {
+                return ResourceManager.GetString("PsiphonConnected", resourceCulture);
+            }
+        }
+
+        public static string PsiphonDisconnected {
+            get {
+                return ResourceManager.GetString("PsiphonDisconnected", resourceCulture);
             }
         }
     }

@@ -76,6 +76,10 @@
                                     Height="{StaticResource MenuItemHeight}"
                                     Header="{x:Static resx:ResUI.menuAddAetherServer}" />
                                 <MenuItem
+                                    x:Name="menuAddPsiphonServer"
+                                    Height="{StaticResource MenuItemHeight}"
+                                    Header="{x:Static resx:ResUI.menuAddPsiphonServer}" />
+                                <MenuItem
                                     x:Name="menuAddCustomServer"
                                     Height="{StaticResource MenuItemHeight}"
                                     Header="{x:Static resx:ResUI.menuAddCustomServer}" />
@@ -276,6 +280,10 @@
                                     x:Name="menuMhrSetting"
                                     Height="{StaticResource MenuItemHeight}"
                                     Header="MHR Settings" />
+                                <MenuItem
+                                    x:Name="menuPsiphonSetting"
+                                    Height="{StaticResource MenuItemHeight}"
+                                    Header="Psiphon Shirokhorshid Settings" />
                                 <MenuItem
                                     x:Name="menuStopMhr"
                                     Height="{StaticResource MenuItemHeight}"

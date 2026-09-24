@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Process Terminator Script for Linux
 # This script forcibly terminates a process and all its child processes

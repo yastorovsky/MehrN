@@ -34,6 +34,7 @@ public partial class MainWindowViewModel : MyReactiveObject
     public ReactiveCommand<RxVoid, RxVoid> AddAnytlsServerCmd { get; }
     public ReactiveCommand<RxVoid, RxVoid> AddNaiveServerCmd { get; }
     public ReactiveCommand<RxVoid, RxVoid> AddAetherServerCmd { get; }
+    public ReactiveCommand<RxVoid, RxVoid> AddPsiphonServerCmd { get; }
     public ReactiveCommand<RxVoid, RxVoid> AddCustomServerCmd { get; }
     public ReactiveCommand<RxVoid, RxVoid> AddCustomOutboundServerCmd { get; }
     public ReactiveCommand<RxVoid, RxVoid> AddPolicyGroupServerCmd { get; }
@@ -65,6 +66,7 @@ public partial class MainWindowViewModel : MyReactiveObject
     public ReactiveCommand<RxVoid, RxVoid> SniSpoofingSettingCmd { get; }
     public ReactiveCommand<RxVoid, RxVoid> MhrSettingCmd { get; }
     public ReactiveCommand<RxVoid, RxVoid> StopMhrCmd { get; }
+    public ReactiveCommand<RxVoid, RxVoid> PsiphonSettingCmd { get; }
 
     //Presets
     public ReactiveCommand<RxVoid, RxVoid> RegionalPresetDefaultCmd { get; }
@@ -153,6 +155,10 @@ public partial class MainWindowViewModel : MyReactiveObject
         AddAetherServerCmd = ReactiveCommand.CreateFromTask(async () =>
         {
             await AddAetherServerAsync();
+        });
+        AddPsiphonServerCmd = ReactiveCommand.CreateFromTask(async () =>
+        {
+            await AddPsiphonServerAsync();
         });
         AddCustomServerCmd = ReactiveCommand.CreateFromTask(async () =>
         {
@@ -262,6 +268,14 @@ public partial class MainWindowViewModel : MyReactiveObject
         MhrSettingCmd = ReactiveCommand.CreateFromTask(async () =>
         {
             var viewModel = new MhrSettingViewModel();
+            if (await AppManager.Instance.WindowDialog.ShowDialogAsync(viewModel) == true)
+            {
+                NoticeManager.Instance.Enqueue(ResUI.OperationSuccess);
+            }
+        });
+        PsiphonSettingCmd = ReactiveCommand.CreateFromTask(async () =>
+        {
+            var viewModel = new PsiphonSettingViewModel();
             if (await AppManager.Instance.WindowDialog.ShowDialogAsync(viewModel) == true)
             {
                 NoticeManager.Instance.Enqueue(ResUI.OperationSuccess);
@@ -573,6 +587,33 @@ public partial class MainWindowViewModel : MyReactiveObject
         }
     }
 
+    public async Task AddPsiphonServerAsync(ProfileItem? editItem = null)
+    {
+        var item = editItem ?? new ProfileItem
+        {
+            Subid = _config.SubIndexId,
+            ConfigType = EConfigType.Custom,
+            CoreType = ECoreType.psiphon,
+            IsSub = false,
+            PreSocksPort = 1080,
+            Address = Global.Loopback,
+            Port = 1080,
+            DisplayLog = true,
+            Remarks = "Psiphon Shirokhorshid",
+        };
+
+        var addPsiphonServerViewModel = new AddPsiphonServerViewModel(item);
+        var ret = await AppManager.Instance.WindowDialog.ShowDialogAsync(addPsiphonServerViewModel);
+        if (ret == true)
+        {
+            await RefreshServersDispatcherAsync();
+            if (item.IndexId == _config.IndexId)
+            {
+                await Reload();
+            }
+        }
+    }
+
     public async Task DoubleTunnelAsync()
     {
         var doubleTunnelViewModel = new DoubleTunnelViewModel();
@@ -814,21 +855,28 @@ public partial class MainWindowViewModel : MyReactiveObject
                 await SysProxyHandler.UpdateSysProxy(_config, false);
                 await Task.Delay(1000);
             });
-            RxSchedulers.MainThreadScheduler.Schedule(async () =>
-            {
-                var result = await StatusBarViewModel.TestServerAvailability();
-                if (result == null || profileItem.IndexId.IsNullOrEmpty())
-                {
-                    return;
-                }
+            var isPsiphon = profileItem.CoreType == ECoreType.psiphon
+                || (allResult.PreSocksResult?.Context?.Node?.CoreType == ECoreType.psiphon)
+                || (profileItem.ConfigType == EConfigType.ProxyChain && allResult.MainResult.Context.AllProxiesMap.Values.Any(p => p.CoreType == ECoreType.psiphon));
 
-                await ProfilesViewModel.SetSpeedTestResult(new()
+            if (!isPsiphon)
+            {
+                RxSchedulers.MainThreadScheduler.Schedule(async () =>
                 {
-                    IndexId = profileItem.IndexId,
-                    IpInfo = result.Ip,
-                    Delay = result.Time > 0 ? result.Time.ToString() : null
+                    var result = await StatusBarViewModel.TestServerAvailability();
+                    if (result == null || profileItem.IndexId.IsNullOrEmpty())
+                    {
+                        return;
+                    }
+
+                    await ProfilesViewModel.SetSpeedTestResult(new()
+                    {
+                        IndexId = profileItem.IndexId,
+                        IpInfo = result.Ip,
+                        Delay = result.Time > 0 ? result.Time.ToString() : null
+                    });
                 });
-            });
+            }
 
             var showClashUI = AppManager.Instance.IsRunningCore(ECoreType.sing_box);
             if (showClashUI)

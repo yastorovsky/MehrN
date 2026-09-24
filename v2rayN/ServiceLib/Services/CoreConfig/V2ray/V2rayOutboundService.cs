@@ -207,9 +207,16 @@ public partial class CoreConfigV2rayService
                         outbound.settings = setting;
                         break;
                     }
+                case EConfigType.Custom:
+                    {
+                        var socksPort = _node.PreSocksPort is > 0 and <= 65535 ? _node.PreSocksPort.Value : (_node.CoreType == ECoreType.aether ? 1819 : 1080);
+                        outboundSettings.address = Global.Loopback;
+                        outboundSettings.port = socksPort;
+                        break;
+                    }
             }
 
-            outbound.protocol = Global.ProtocolTypes[_node.ConfigType];
+            outbound.protocol = _node.ConfigType == EConfigType.Custom ? "socks" : Global.ProtocolTypes[_node.ConfigType];
             if (_node.ConfigType == EConfigType.Hysteria2)
             {
                 outbound.protocol = "hysteria";
@@ -739,7 +746,11 @@ public partial class CoreConfigV2rayService
 
             if (!dialerProxyTag.IsNullOrEmpty())
             {
-                FillDialerProxy(outbound, dialerProxyTag);
+                var nextNode = i != nodesReverse.Count - 1 ? nodesReverse[i + 1] : null;
+                if (node.ConfigType != EConfigType.Custom || nextNode?.ConfigType != EConfigType.Custom)
+                {
+                    FillDialerProxy(outbound, dialerProxyTag);
+                }
             }
 
             resultOutbounds.Add(outbound);
