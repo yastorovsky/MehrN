@@ -141,6 +141,10 @@ public class CoreManager
                         _extraProcessServices.Add(exitProc);
                     }
                     await WaitForPort(exitPort);
+                    if (exit.CoreType == ECoreType.psiphon)
+                    {
+                        await WaitForPsiphonTunnel(25);
+                    }
 
                     // 3. Re-generate main core config with updated AllProxiesMap and start main core (Xray / Sing-box)
                     await CoreConfigHandler.GenerateClientConfig(mainContext, fileName);
@@ -184,6 +188,10 @@ public class CoreManager
                         _extraProcessServices.Add(exitProc);
                     }
                     await WaitForPort(exitPort);
+                    if (exit.CoreType == ECoreType.psiphon)
+                    {
+                        await WaitForPsiphonTunnel(25);
+                    }
 
                     AppManager.Instance.RunningCoreType = mainContext.RunCoreType;
                     if (_processService != null)
@@ -388,6 +396,10 @@ public class CoreManager
             ? (preContext.Node.PreSocksPort is > 0 and <= 65535 ? preContext.Node.PreSocksPort.Value : (preContext.Node.CoreType == ECoreType.aether ? 1819 : 1080))
             : preContext.Node.Port;
         await WaitForPort(port);
+        if (preContext.Node.CoreType == ECoreType.psiphon)
+        {
+            await WaitForPsiphonTunnel(25);
+        }
     }
 
     private static async Task WaitForPort(int port)
@@ -649,6 +661,22 @@ public class CoreManager
 
     private static bool _psiphonIsConnected = false;
 
+    public static async Task WaitForPsiphonTunnel(int timeoutSeconds = 25)
+    {
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(timeoutSeconds));
+        while (!cts.IsCancellationRequested && !_psiphonIsConnected)
+        {
+            try
+            {
+                await Task.Delay(200, cts.Token);
+            }
+            catch (OperationCanceledException)
+            {
+                break;
+            }
+        }
+    }
+
     private static async Task HandlePsiphonOutput(string rawMsg, Func<bool, string, Task>? baseUpdateFunc)
     {
         if (rawMsg.IsNullOrEmpty())
@@ -657,101 +685,145 @@ public class CoreManager
         }
 
         var trimmed = rawMsg.Trim();
+        string? noticeType = null;
+        JsonElement dataElem = default;
+        bool hasData = false;
+
         if (trimmed.StartsWith('{') && trimmed.EndsWith('}'))
         {
             try
             {
                 using var doc = JsonDocument.Parse(trimmed);
                 var root = doc.RootElement;
-                if (root.TryGetProperty("noticeType", out var noticeTypeProp))
+                if (root.TryGetProperty("noticeType", out var nt))
                 {
-                    var noticeType = noticeTypeProp.GetString();
-                    var timeStr = DateTime.Now.ToString("HH:mm:ss");
-
-                    switch (noticeType)
+                    noticeType = nt.GetString();
+                    if (root.TryGetProperty("data", out var d))
                     {
-                        case "ListeningSocksProxyPort":
-                            {
-                                var port = root.TryGetProperty("data", out var d) && d.TryGetProperty("port", out var p) ? p.ToString() : "1080";
-                                var logLine = $"[{timeStr}] [Psiphon Shirokhorshid] SOCKS proxy listening on 127.0.0.1:{port}" + Environment.NewLine;
-                                if (baseUpdateFunc != null) await baseUpdateFunc(false, logLine);
-                                return;
-                            }
-
-                        case "CandidateServers":
-                            {
-                                var count = root.TryGetProperty("data", out var d) && d.TryGetProperty("count", out var c) ? c.ToString() : "0";
-                                var logLine = $"[{timeStr}] [Psiphon Shirokhorshid] Found {count} candidate servers. Connecting..." + Environment.NewLine;
-                                UpdatePsiphonStatus(ResUI.PsiphonConnecting, isConnected: false);
-                                if (baseUpdateFunc != null) await baseUpdateFunc(false, logLine);
-                                return;
-                            }
-
-                        case "ConnectingServer":
-                            {
-                                var region = root.TryGetProperty("data", out var d) && d.TryGetProperty("egressRegion", out var r) ? r.GetString() : null;
-                                var proto = root.TryGetProperty("data", out var d2) && d2.TryGetProperty("protocol", out var p) ? p.GetString() : null;
-                                var detail = region.IsNotEmpty() ? $" ({region} / {proto})" : "";
-                                var logLine = $"[{timeStr}] [Psiphon Shirokhorshid] Connecting to server{detail}..." + Environment.NewLine;
-                                UpdatePsiphonStatus(ResUI.PsiphonConnecting, isConnected: false);
-                                if (baseUpdateFunc != null) await baseUpdateFunc(false, logLine);
-                                return;
-                            }
-
-                        case "ConnectedServer":
-                            {
-                                var region = root.TryGetProperty("data", out var d) && d.TryGetProperty("egressRegion", out var r) ? r.GetString() : null;
-                                var logLine = $"[{timeStr}] [Psiphon Shirokhorshid] Connected to server" + (region.IsNotEmpty() ? $" in {region}" : "") + ". Establishing tunnel..." + Environment.NewLine;
-                                if (baseUpdateFunc != null) await baseUpdateFunc(false, logLine);
-                                return;
-                            }
-
-                        case "ActiveTunnel":
-                            {
-                                var proto = root.TryGetProperty("data", out var d) && d.TryGetProperty("protocol", out var p) ? p.GetString() : null;
-                                var logLine = $"[{timeStr}] [Psiphon Shirokhorshid] Active tunnel established ({proto})." + Environment.NewLine;
-                                if (baseUpdateFunc != null) await baseUpdateFunc(false, logLine);
-                                return;
-                            }
-
-                        case "Tunnels":
-                            {
-                                var count = root.TryGetProperty("data", out var d) && d.TryGetProperty("count", out var c) ? c.GetInt32() : 0;
-                                if (count > 0)
-                                {
-                                    var logLine = $"[{timeStr}] [Psiphon Shirokhorshid] Connected! Active tunnels: {count}" + Environment.NewLine;
-                                    UpdatePsiphonStatus(string.Format(ResUI.PsiphonConnected, count), isConnected: true);
-                                    if (baseUpdateFunc != null) await baseUpdateFunc(false, logLine);
-                                }
-                                else
-                                {
-                                    var logLine = $"[{timeStr}] [Psiphon Shirokhorshid] Disconnected (0 active tunnels). Reconnecting..." + Environment.NewLine;
-                                    UpdatePsiphonStatus(ResUI.PsiphonDisconnected, isConnected: false);
-                                    if (baseUpdateFunc != null) await baseUpdateFunc(false, logLine);
-                                }
-                                return;
-                            }
-
-                        case "Alert":
-                            {
-                                var msg = root.TryGetProperty("data", out var d) && d.TryGetProperty("message", out var m) ? m.GetString() : null;
-                                if (msg.IsNotEmpty())
-                                {
-                                    var logLine = $"[{timeStr}] [Psiphon Shirokhorshid Alert] {msg}" + Environment.NewLine;
-                                    if (baseUpdateFunc != null) await baseUpdateFunc(false, logLine);
-                                    return;
-                                }
-                                break;
-                            }
-
-                        case "BytesTransferred":
-                            return;
+                        dataElem = d.Clone();
+                        hasData = true;
                     }
                 }
             }
-            catch
+            catch { }
+        }
+        else
+        {
+            // Formatted notices: "2026-09-24T12:50:15.277Z Tunnels {"count":1}"
+            var firstSpace = trimmed.IndexOf(' ');
+            if (firstSpace > 0)
             {
-                // Fallback to raw output if parse fails
+                var secondSpace = trimmed.IndexOf(' ', firstSpace + 1);
+                if (secondSpace > 0)
+                {
+                    noticeType = trimmed.Substring(firstSpace + 1, secondSpace - firstSpace - 1);
+                    var jsonPart = trimmed.Substring(secondSpace + 1).Trim();
+                    if (jsonPart.StartsWith('{') && jsonPart.EndsWith('}'))
+                    {
+                        try
+                        {
+                            using var doc = JsonDocument.Parse(jsonPart);
+                            dataElem = doc.RootElement.Clone();
+                            hasData = true;
+                        }
+                        catch { }
+                    }
+                }
+            }
+        }
+
+        if (noticeType.IsNotEmpty())
+        {
+            var timeStr = DateTime.Now.ToString("HH:mm:ss");
+            switch (noticeType)
+            {
+                case "ListeningSocksProxyPort":
+                    {
+                        var port = hasData && dataElem.TryGetProperty("port", out var p) ? p.ToString() : "1080";
+                        var logLine = $"[{timeStr}] [Psiphon Shirokhorshid] SOCKS proxy listening on 127.0.0.1:{port}" + Environment.NewLine;
+                        if (baseUpdateFunc != null) await baseUpdateFunc(false, logLine);
+                        return;
+                    }
+
+                case "CandidateServers":
+                    {
+                        var count = hasData && dataElem.TryGetProperty("count", out var c) ? c.ToString() : "0";
+                        var logLine = $"[{timeStr}] [Psiphon Shirokhorshid] Found {count} candidate servers. Connecting..." + Environment.NewLine;
+                        UpdatePsiphonStatus(ResUI.PsiphonConnecting, isConnected: false);
+                        if (baseUpdateFunc != null) await baseUpdateFunc(false, logLine);
+                        return;
+                    }
+
+                case "ConnectingServer":
+                    {
+                        var region = hasData && (dataElem.TryGetProperty("region", out var r) || dataElem.TryGetProperty("egressRegion", out r)) ? r.GetString() : null;
+                        var proto = hasData && dataElem.TryGetProperty("protocol", out var p) ? p.GetString() : null;
+                        var detail = region.IsNotEmpty() ? $" ({region} / {proto})" : "";
+                        var logLine = $"[{timeStr}] [Psiphon Shirokhorshid] Connecting to server{detail}..." + Environment.NewLine;
+                        UpdatePsiphonStatus(ResUI.PsiphonConnecting, isConnected: false);
+                        if (baseUpdateFunc != null) await baseUpdateFunc(false, logLine);
+                        return;
+                    }
+
+                case "ConnectedServer":
+                case "ConnectedServerRegion":
+                    {
+                        var region = hasData && (dataElem.TryGetProperty("serverRegion", out var r) || dataElem.TryGetProperty("egressRegion", out r) || dataElem.TryGetProperty("region", out r)) ? r.GetString() : null;
+                        var logLine = $"[{timeStr}] [Psiphon Shirokhorshid] Connected to server" + (region.IsNotEmpty() ? $" in {region}" : "") + ". Establishing tunnel..." + Environment.NewLine;
+                        if (baseUpdateFunc != null) await baseUpdateFunc(false, logLine);
+                        return;
+                    }
+
+                case "ActiveTunnel":
+                    {
+                        var proto = hasData && dataElem.TryGetProperty("protocol", out var p) ? p.GetString() : null;
+                        var logLine = $"[{timeStr}] [Psiphon Shirokhorshid] Active tunnel established ({proto})." + Environment.NewLine;
+                        if (baseUpdateFunc != null) await baseUpdateFunc(false, logLine);
+                        return;
+                    }
+
+                case "Tunnels":
+                    {
+                        var count = hasData && dataElem.TryGetProperty("count", out var c) ? c.GetInt32() : 0;
+                        if (count > 0)
+                        {
+                            var logLine = $"[{timeStr}] [Psiphon Shirokhorshid] Connected! Active tunnels: {count}" + Environment.NewLine;
+                            UpdatePsiphonStatus(string.Format(ResUI.PsiphonConnected, count), isConnected: true);
+                            if (baseUpdateFunc != null) await baseUpdateFunc(false, logLine);
+                        }
+                        else
+                        {
+                            var logLine = $"[{timeStr}] [Psiphon Shirokhorshid] Disconnected (0 active tunnels). Reconnecting..." + Environment.NewLine;
+                            UpdatePsiphonStatus(ResUI.PsiphonDisconnected, isConnected: false);
+                            if (baseUpdateFunc != null) await baseUpdateFunc(false, logLine);
+                        }
+                        return;
+                    }
+
+                case "Alert":
+                    {
+                        var msg = hasData && dataElem.TryGetProperty("message", out var m) ? m.GetString() : null;
+                        if (msg.IsNotEmpty())
+                        {
+                            var logLine = $"[{timeStr}] [Psiphon Shirokhorshid Alert] {msg}" + Environment.NewLine;
+                            if (baseUpdateFunc != null) await baseUpdateFunc(false, logLine);
+                            return;
+                        }
+                        break;
+                    }
+
+                case "BytesTransferred":
+                case "ServerTimestamp":
+                case "ActiveAuthorizationIDs":
+                case "TrafficRateLimits":
+                case "ClientUpgradeAvailable":
+                case "Homepage":
+                case "SessionId":
+                case "NetworkID":
+                case "RequestingTactics":
+                case "RequestedTactics":
+                case "ApplicationParameters":
+                    return;
             }
         }
 
